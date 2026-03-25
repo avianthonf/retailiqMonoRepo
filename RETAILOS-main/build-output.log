@@ -1,0 +1,307 @@
+
+> retailos@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+  - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+./app/(auth)/register/page.tsx
+33:10  Error: 'formData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+33:20  Error: 'setFormData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/ai/chat/history/route.ts
+6:27  Error: 'req' is defined but never used.  @typescript-eslint/no-unused-vars
+21:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+49:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/ai/chat/route.ts
+39:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/ai/forecast/route.ts
+8:28  Error: 'req' is defined but never used.  @typescript-eslint/no-unused-vars
+29:30  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+58:26  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+81:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/ai/insights/route.ts
+8:27  Error: 'req' is defined but never used.  @typescript-eslint/no-unused-vars
+33:30  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+45:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/analytics/route.ts
+5:43  Error: 'startOfDay' is defined but never used.  @typescript-eslint/no-unused-vars
+27:48  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+48:20  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+55:34  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+58:37  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+86:11  Error: 'aovData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+91:42  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+108:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/customers/route.ts
+22:18  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+47:49  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+61:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+98:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/customers/[id]/route.ts
+35:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+51:23  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+63:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+82:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/dashboard/route.ts
+5:36  Error: 'subMonths' is defined but never used.  @typescript-eslint/no-unused-vars
+5:47  Error: 'endOfMonth' is defined but never used.  @typescript-eslint/no-unused-vars
+16:11  Error: 'todayStart' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+27:61  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+66:49  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+91:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/financials/route.ts
+65:50  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+82:38  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+106:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/financials/transactions/route.ts
+21:18  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+40:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+67:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/inventory/route.ts
+23:18  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+43:50  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+67:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+108:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/inventory/[id]/route.ts
+5:10  Error: 'CreateProductSchema' is defined but never used.  @typescript-eslint/no-unused-vars
+24:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+63:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+78:11  Error: 'orderCount' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+90:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/orders/route.ts
+23:18  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+53:43  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+66:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+100:43  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+108:57  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+115:48  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+121:45  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+159:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/orders/[id]/route.ts
+25:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+54:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+75:42  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+105:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/reports/route.ts
+6:58  Error: 'endOfDay' is defined but never used.  @typescript-eslint/no-unused-vars
+7:10  Error: 'ReportType' is defined but never used.  @typescript-eslint/no-unused-vars
+21:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+34:19  Error: 'dateRange' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+34:30  Error: 'metrics' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+101:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/reports/schedule/route.ts
+17:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+44:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+62:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/reports/[id]/route.ts
+22:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+39:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/seed/route.ts
+132:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/settings/route.ts
+23:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+57:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/dashboard/ai/page.tsx
+4:18  Error: 'AnimatePresence' is defined but never used.  @typescript-eslint/no-unused-vars
+26:16  Error: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+106:21  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/dashboard/customers/page.tsx
+6:11  Error: 'Filter' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/dashboard/customers/[id]/page.tsx
+9:22  Error: 'Package' is defined but never used.  @typescript-eslint/no-unused-vars
+20:10  Error: 'Customer' is defined but never used.  @typescript-eslint/no-unused-vars
+24:52  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+61:28  Error: React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+
+./app/dashboard/inventory/page.tsx
+6:8  Error: 'AnimatedCounter' is defined but never used.  @typescript-eslint/no-unused-vars
+34:10  Error: 'loading' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/dashboard/loading.tsx
+3:10  Error: 'motion' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/dashboard/orders/page.tsx
+18:10  Error: 'loading' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+22:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/dashboard/page.tsx
+18:3  Error: 'TrendingUp' is defined but never used.  @typescript-eslint/no-unused-vars
+28:3  Error: 'MoveRight' is defined but never used.  @typescript-eslint/no-unused-vars
+29:3  Error: 'PhoneCall' is defined but never used.  @typescript-eslint/no-unused-vars
+32:3  Error: 'FileTextIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+34:13  Error: 'InputIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+112:73  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+122:67  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+152:37  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+161:74  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+165:39  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+171:61  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+340:27  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/dashboard/reports/page.tsx
+3:27  Error: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+6:13  Error: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+6:23  Error: 'Filter' is defined but never used.  @typescript-eslint/no-unused-vars
+9:34  Error: 'Check' is defined but never used.  @typescript-eslint/no-unused-vars
+43:48  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+305:25  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+305:39  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./app/dashboard/settings/page.tsx
+7:13  Error: 'Save' is defined but never used.  @typescript-eslint/no-unused-vars
+7:34  Error: 'Globe' is defined but never used.  @typescript-eslint/no-unused-vars
+8:10  Error: 'CreditCard' is defined but never used.  @typescript-eslint/no-unused-vars
+8:22  Error: 'Layout' is defined but never used.  @typescript-eslint/no-unused-vars
+8:30  Error: 'Monitor' is defined but never used.  @typescript-eslint/no-unused-vars
+56:45  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+83:47  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+191:50  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+203:47  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+219:54  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+230:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+238:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+257:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+265:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+278:57  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+364:41  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+365:35  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+389:59  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+410:39  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+422:32  Error: 'settings' is defined but never used.  @typescript-eslint/no-unused-vars
+422:42  Error: 'handleChange' is defined but never used.  @typescript-eslint/no-unused-vars
+422:58  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+464:49  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+476:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+484:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+504:25  Error: 'settings' is defined but never used.  @typescript-eslint/no-unused-vars
+504:35  Error: 'handleChange' is defined but never used.  @typescript-eslint/no-unused-vars
+504:61  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+523:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/ai/ForecastWidget.tsx
+4:18  Error: 'AnimatePresence' is defined but never used.  @typescript-eslint/no-unused-vars
+6:3  Error: 'LineChart' is defined but never used.  @typescript-eslint/no-unused-vars
+6:14  Error: 'Line' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/analytics/AOVTrendChart.tsx
+4:20  Error: 'LineChart' is defined but never used.  @typescript-eslint/no-unused-vars
+4:31  Error: 'Line' is defined but never used.  @typescript-eslint/no-unused-vars
+14:52  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+19:24  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/analytics/CategorySalesChart.tsx
+18:52  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+20:47  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+24:24  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+45:58  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/analytics/CustomerSegmentChart.tsx
+10:45  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/financials/ExpenseDonut.tsx
+4:54  Error: 'Legend' is defined but never used.  @typescript-eslint/no-unused-vars
+12:45  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+27:4  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/financials/PLSummary.tsx
+12:10  Error: 'fmt' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/financials/ProfitMarginChart.tsx
+13:52  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/financials/RevenueExpenseChart.tsx
+13:52  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+18:24  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/financials/WaterfallChart.tsx
+27:43  Error: 'label' is defined but never used.  @typescript-eslint/no-unused-vars
+27:52  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/inventory/AddProductModal.tsx
+127:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/inventory/ProductCard.tsx
+49:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/inventory/ProductTable.tsx
+173:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/inventory/StockAlerts.tsx
+81:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/layout/Header.tsx
+3:16  Error: 'Search' is defined but never used.  @typescript-eslint/no-unused-vars
+102:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/layout/Sidebar.tsx
+43:9  Error: 'toggleSidebar' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./components/ui/action-search-bar.tsx
+90:28  Error: 'actions' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+95:12  Error: 'isTyping' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./components/ui/animated-kpi-card.tsx
+5:10  Error: 'motion' is defined but never used.  @typescript-eslint/no-unused-vars
+13:18  Error: An interface declaring no members is equivalent to its supertype.  @typescript-eslint/no-empty-object-type
+
+./components/ui/bento-grid.tsx
+38:9  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/ui/text-shimmer.tsx
+21:79  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/ai.ts
+20:44  Error: 'userId' is defined but never used.  @typescript-eslint/no-unused-vars
+121:52  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+166:56  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/analytics.ts
+1:31  Error: 'isWithinInterval' is defined but never used.  @typescript-eslint/no-unused-vars
+81:7  Error: 'current' is never reassigned. Use 'const' instead.  prefer-const
+111:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/prisma.ts
+1:14  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+3:39  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+7:34  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
+11:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+14:32  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/queryStore.ts
+5:23  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+6:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+8:46  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+10:54  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+48:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+74:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+83:6  Warning: React Hook useEffect has missing dependencies: 'queryFn', 'queryKey', and 'refetchInterval'. Either include them or remove the dependency array. If 'queryFn' changes too often, find the parent component that defines it and wrap that definition in useCallback.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
