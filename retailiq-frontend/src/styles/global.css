@@ -219,6 +219,12 @@ svg {
   color: var(--text-muted);
 }
 
+.sidebar__footer-subtitle {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
 .sidebar__footer-metrics {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -289,6 +295,31 @@ svg {
   margin: 0;
   font-size: 1.2rem;
   letter-spacing: -0.02em;
+}
+
+.header__breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.header__crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header__crumb--current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.header__crumb-separator {
+  color: var(--text-muted);
 }
 
 .header__search {

@@ -53,10 +53,23 @@ export default function CalendarPage() {
   const events = eventsQuery.data ?? [];
 
   useEffect(() => {
-    if (!selectedEventId && events.length) {
+    if (!events.length) {
+      setSelectedEventId(null);
+      return;
+    }
+
+    if (!selectedEventId || !events.some((event) => event.id === selectedEventId)) {
       setSelectedEventId(events[0].id);
     }
   }, [events, selectedEventId]);
+
+  useEffect(() => {
+    const selected = parseISO(selectedDate);
+    if (!isSameMonth(selected, visibleMonth)) {
+      const monthStart = format(startOfMonth(visibleMonth), 'yyyy-MM-dd');
+      setSelectedDate(monthStart);
+    }
+  }, [selectedDate, visibleMonth]);
 
   const calendarDays = useMemo(() => {
     const start = startOfMonth(visibleMonth);
@@ -138,7 +151,13 @@ export default function CalendarPage() {
           ) : eventsQuery.isError ? (
             <ErrorState error={normalizeApiError(eventsQuery.error)} onRetry={() => void eventsQuery.refetch()} />
           ) : (
-            <div className="grid gap-6 xl:grid-cols-[1.4fr_0.9fr]">
+            <div className="space-y-4">
+              {!events.length ? (
+                <div className="rounded-2xl border border-dashed border-border bg-slate-50/60 p-4 text-sm text-muted-foreground">
+                  No events scheduled in this month. Use the add-event form to create a new deadline, promotion, or closure.
+                </div>
+              ) : null}
+              <div className="grid gap-6 xl:grid-cols-[1.4fr_0.9fr]">
               <div className="overflow-hidden rounded-2xl border border-border/60 bg-white shadow-sm">
                 <div className="grid grid-cols-7 border-b border-border/60 bg-slate-50 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
@@ -270,6 +289,7 @@ export default function CalendarPage() {
                   </CardContent>
                 </Card>
               </div>
+            </div>
             </div>
           )}
         </CardContent>

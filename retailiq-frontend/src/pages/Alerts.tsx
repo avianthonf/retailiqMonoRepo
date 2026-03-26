@@ -111,7 +111,16 @@ export default function AlertsPage() {
   return (
     <PageFrame
       title="Smart Alerts"
-      subtitle="Unified dashboard and inventory alerts with quick filters and one-click dismissals."
+      subtitle="Unified dashboard and inventory alerts with quick filters, clear priorities, and one-click dismissals."
+      actions={
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary">{visibleAlerts.length} visible</Badge>
+          <Badge variant="info">{unifiedAlerts.length} total</Badge>
+          <Badge variant={visibleAlerts.some((alert) => alert.severity === 'high') ? 'danger' : 'secondary'}>
+            {visibleAlerts.filter((alert) => alert.severity === 'high').length} critical
+          </Badge>
+        </div>
+      }
     >
       <Card className="border-border/60 shadow-sm">
         <CardHeader className="flex flex-wrap items-center justify-between gap-3">

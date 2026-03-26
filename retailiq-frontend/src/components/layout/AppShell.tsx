@@ -9,12 +9,13 @@ import { uiStore } from '@/stores/uiStore';
 export function AppShell() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const collapsed = uiStore((state) => state.sidebarCollapsed);
+  const toggleSidebar = uiStore((state) => state.toggleSidebar);
 
   return (
     <div className="app-shell" style={{ gridTemplateColumns: collapsed ? 'var(--sidebar-collapsed) minmax(0, 1fr)' : 'var(--sidebar-width) minmax(0, 1fr)' }}>
       <Sidebar />
       <div className="app-shell__main">
-        <Header onOpenPalette={() => setPaletteOpen(true)} />
+        <Header onOpenPalette={() => setPaletteOpen(true)} onToggleSidebar={toggleSidebar} />
         <main className="app-shell__content">
           <Outlet />
         </main>

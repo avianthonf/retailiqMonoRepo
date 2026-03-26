@@ -1,16 +1,16 @@
 import { lazy } from 'react';
 
-export const LoginPage = lazy(() => import('@/pages/Login'));
-export const RegisterPage = lazy(() => import('@/pages/Register'));
-export const VerifyOtpPage = lazy(() => import('@/pages/VerifyOtp'));
-export const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPassword'));
-export const ResetPasswordPage = lazy(() => import('@/pages/ResetPassword'));
-export const MfaSetupPage = lazy(() => import('@/pages/MfaSetup'));
-export const MfaVerifyPage = lazy(() => import('@/pages/MfaVerify'));
-export const DashboardPage = lazy(() => import('@/pages/Dashboard'));
-export const AlertsPage = lazy(() => import('@/pages/Alerts'));
-export const CalendarPage = lazy(() => import('@/pages/Calendar'));
-export const ReportsPage = lazy(() => import('@/pages/Reports'));
+export const LoginPage = lazy(() => import('@/features/auth/LoginPage'));
+export const RegisterPage = lazy(() => import('@/features/auth/RegisterPage'));
+export const VerifyOtpPage = lazy(() => import('@/features/auth/VerifyOtpPage'));
+export const ForgotPasswordPage = lazy(() => import('@/features/auth/ForgotPasswordPage'));
+export const ResetPasswordPage = lazy(() => import('@/features/auth/ResetPasswordPage'));
+export const MfaSetupPage = lazy(() => import('@/features/auth/MfaSetupPage'));
+export const MfaVerifyPage = lazy(() => import('@/features/auth/MfaVerifyPage'));
+export const DashboardPage = lazy(() => import('@/features/dashboard/DashboardPage'));
+export const AlertsPage = lazy(() => import('@/features/dashboard/AlertsPage'));
+export const CalendarPage = lazy(() => import('@/features/dashboard/CalendarPage'));
+export const ReportsPage = lazy(() => import('@/features/reports/ReportsPage'));
 export const PosPage = lazy(() => import('@/pages/Pos'));
 export const TransactionsPage = lazy(() => import('@/pages/Transactions'));
 export const TransactionDetailPage = lazy(() => import('@/pages/TransactionDetail'));

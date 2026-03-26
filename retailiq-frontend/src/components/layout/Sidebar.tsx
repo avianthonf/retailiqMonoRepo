@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import { NavLink } from 'react-router-dom';
-import { BarChart3, Boxes, BrainCircuit, Building2, ChevronLeft, ChevronRight, CircleDollarSign, CreditCard, FileText, FolderKanban, Globe2, LayoutDashboard, Megaphone, PackageSearch, ReceiptText, Settings2, ShieldCheck, ShoppingCart, Sparkles, Store, Users, Webhook, Zap } from 'lucide-react';
+import { BarChart3, Boxes, BrainCircuit, Building2, ChevronLeft, ChevronRight, CircleDollarSign, CreditCard, FileText, FolderKanban, Globe2, LayoutDashboard, Megaphone, ReceiptText, RefreshCcw, ScanLine, Settings2, ShieldCheck, ShoppingCart, Sparkles, Store, Users, Webhook, Zap } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { uiStore } from '@/stores/uiStore';
 import { authStore } from '@/stores/authStore';
@@ -25,7 +25,7 @@ const navGroups: NavGroup[] = [
       { label: 'Overview', to: routes.dashboard, icon: LayoutDashboard },
       { label: 'Smart Alerts', to: routes.dashboardAlerts, icon: Sparkles },
       { label: 'Reports', to: routes.dashboardReports, icon: FileText },
-      { label: 'Financial Calendar', to: routes.dashboardCalendar, icon: CalendarIcon },
+      { label: 'Financial Calendar', to: routes.dashboardCalendar, icon: RefreshCcw },
     ],
   },
   {
@@ -34,7 +34,7 @@ const navGroups: NavGroup[] = [
       { label: 'Products', to: routes.inventory, icon: Boxes },
       { label: 'Stock Audit', to: '/inventory/stock-audit', icon: ShieldCheck },
       { label: 'Receipts & Barcodes', to: '/receipts/queue', icon: ReceiptText },
-      { label: 'Vision OCR', to: routes.vision, icon: ScanIcon },
+      { label: 'Vision OCR', to: routes.vision, icon: ScanLine },
       { label: 'Pricing', to: routes.pricing, icon: CircleDollarSign, ownerOnly: true },
       { label: 'Forecasting', to: routes.forecasting, icon: BarChart3, ownerOnly: true },
     ],
@@ -44,7 +44,7 @@ const navGroups: NavGroup[] = [
     items: [
       { label: 'POS / New Sale', to: '/pos', icon: ShoppingCart },
       { label: 'Transactions', to: routes.transactions, icon: FileText },
-      { label: 'Returns', to: '/returns', icon: RotateIcon },
+      { label: 'Returns', to: '/returns', icon: RefreshCcw },
       { label: 'Purchase Orders', to: '/purchase-orders', icon: FolderKanban },
       { label: 'Suppliers', to: routes.suppliers, icon: Store },
       { label: 'Marketplace', to: routes.marketplace, icon: Building2 },
@@ -89,24 +89,12 @@ const navGroups: NavGroup[] = [
     title: 'Settings',
     items: [
       { label: 'Store Profile', to: routes.settings, icon: Store, ownerOnly: true },
-      { label: 'i18n', to: routes.i18n, icon: Globe2 },
+      { label: 'Language / i18n', to: routes.i18n, icon: Globe2 },
     ],
   },
 ];
 
 const calendarDays = [1, 2, 3, 4, 5, 6];
-
-function CalendarIcon({ className }: { className?: string }) {
-  return <span className={className}>31</span>;
-}
-
-function ScanIcon({ className }: { className?: string }) {
-  return <span className={className}>OCR</span>;
-}
-
-function RotateIcon({ className }: { className?: string }) {
-  return <span className={className}>↺</span>;
-}
 
 export function sidebarNavGroups(role: 'owner' | 'staff' | null) {
   return navGroups.map((group) => ({
@@ -162,6 +150,7 @@ export function Sidebar() {
       <div className="sidebar__footer">
         <div className="sidebar__footer-card">
           <div className="sidebar__footer-title">Store health</div>
+          {!collapsed ? <div className="sidebar__footer-subtitle">Quick pulse of the current branch.</div> : null}
           <div className="sidebar__footer-metrics">
             {calendarDays.map((day) => (
               <span key={day} />

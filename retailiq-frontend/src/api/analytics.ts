@@ -218,6 +218,18 @@ export const analyticsApi = {
     };
   },
 
+  getRevenue: async (period = '30d') => {
+    const params = period ? { period } : undefined;
+    const { data } = await requestEnvelope<RevenueRow[]>({ url: '/api/v1/analytics/revenue', method: 'GET', params });
+    return Array.isArray(data) ? data : [];
+  },
+
+  getProfit: async (period = '30d') => {
+    const params = period ? { period } : undefined;
+    const { data } = await requestEnvelope<ProfitRow[]>({ url: '/api/v1/analytics/profit', method: 'GET', params });
+    return Array.isArray(data) ? data : [];
+  },
+
   getRevenueTrend: async (period = '30d'): Promise<RevenueTrendRow[]> => {
     const { start, end, group_by } = resolveDateRange(period);
     const { data } = await requestEnvelope<RevenueTrendRow[]>({
@@ -234,8 +246,27 @@ export const analyticsApi = {
     return data;
   },
 
+  getContribution: async () => analyticsApi.getProfitContribution(),
+
+  getPaymentModes: async () => analyticsApi.getPaymentModeSummary(),
+
+  getCustomerSummaryAnalytics: async () => analyticsApi.getCustomerAnalytics(),
+
+  getAnalyticsDiagnostics: async () => analyticsApi.getDiagnostics(),
+
   getDiagnostics: async () => {
     const { data } = await requestEnvelope<Record<string, unknown>>({ url: '/api/v1/analytics/diagnostics', method: 'GET' });
     return data;
   },
 };
+
+export const getAnalyticsDashboard = (period = '30d') => analyticsApi.getAnalyticsDashboard(period);
+export const getRevenueTrend = (period = '30d') => analyticsApi.getRevenueTrend(period);
+export const getRevenue = (period = '30d') => analyticsApi.getRevenue(period);
+export const getProfit = (period = '30d') => analyticsApi.getProfit(period);
+export const getTopProducts = () => analyticsApi.getTopProducts();
+export const getCategoryBreakdown = () => analyticsApi.getCategoryBreakdown();
+export const getContribution = () => analyticsApi.getContribution();
+export const getPaymentModes = () => analyticsApi.getPaymentModes();
+export const getCustomerSummaryAnalytics = () => analyticsApi.getCustomerSummaryAnalytics();
+export const getAnalyticsDiagnostics = () => analyticsApi.getAnalyticsDiagnostics();

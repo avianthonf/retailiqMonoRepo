@@ -148,14 +148,18 @@ export default function ReportsPage() {
 
   const loading = analyticsQuery.isLoading || revenueTrendQuery.isLoading || financeQuery.isLoading;
   const error = analyticsQuery.error ?? revenueTrendQuery.error ?? financeQuery.error;
+  const trendPoints = revenueTrendQuery.data?.length ?? 0;
 
   return (
     <PageFrame
       title="Reports"
       subtitle="A reporting hub for exports, module jump-offs, and quick operational snapshots."
       actions={
-        <div className="flex items-center gap-2">
-          <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Period</label>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary">{period.toUpperCase()}</Badge>
+          <Badge variant="info">{trendPoints} trend points</Badge>
+          <Badge variant={gstStatus.startsWith('Generated') ? 'success' : 'secondary'}>{gstStatus}</Badge>
+          <label className="ml-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Period</label>
           <select
             value={period}
             onChange={(event) => setPeriod(event.target.value)}

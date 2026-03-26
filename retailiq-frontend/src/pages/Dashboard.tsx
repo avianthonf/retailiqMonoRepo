@@ -251,13 +251,23 @@ export default function DashboardPage() {
 
   const dashboardSignals = signalsQuery.data?.signals ?? [];
   const incidents = incidentsQuery.data ?? [];
+  const activeSignalCount = dashboardSignals.length;
+  const activeAlertCount = combinedAlerts.length;
+  const activeIncidentCount = incidents.length;
 
   const loadingAnyCard = overviewQuery.isLoading || analyticsQuery.isLoading;
 
   return (
     <PageFrame
       title="Dashboard"
-      subtitle={store ? `Welcome back to ${store.store_name}.` : 'Live operations overview powered by backend aggregations.'}
+      subtitle={store ? `Welcome back to ${store.store_name}.` : 'Live operations overview powered by backend aggregations and alerts.'}
+      actions={
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary">{activeAlertCount} alerts</Badge>
+          <Badge variant="info">{activeSignalCount} signals</Badge>
+          <Badge variant={activeIncidentCount ? 'danger' : 'secondary'}>{activeIncidentCount} incidents</Badge>
+        </div>
+      }
     >
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {loadingAnyCard ? (
