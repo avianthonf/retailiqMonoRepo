@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import { NavLink } from 'react-router-dom';
-import { BarChart3, Boxes, BrainCircuit, Building2, ChevronLeft, ChevronRight, CircleDollarSign, CreditCard, FileText, FolderKanban, Globe2, LayoutDashboard, Laptop2, LockKeyhole, Megaphone, ReceiptText, RefreshCcw, ScanLine, Settings2, ShieldCheck, ShoppingCart, Sparkles, Store, Users, Webhook, Zap } from 'lucide-react';
+import { BarChart3, Boxes, BrainCircuit, Building2, ChevronLeft, ChevronRight, CircleDollarSign, CreditCard, FileText, FolderKanban, Globe2, LayoutDashboard, Laptop2, LockKeyhole, Megaphone, ReceiptText, RefreshCcw, ScanLine, Settings2, ShieldCheck, ShoppingCart, Sparkles, Store, Users, Webhook, X, Zap } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { uiStore } from '@/stores/uiStore';
 import { authStore } from '@/stores/authStore';
@@ -43,9 +43,9 @@ const navGroups: NavGroup[] = [
   {
     title: 'Orders',
     items: [
-      { label: 'POS / New Sale', to: '/pos', icon: ShoppingCart },
+      { label: 'POS / New Sale', to: routes.pos, icon: ShoppingCart },
       { label: 'Transactions', to: routes.transactions, icon: FileText },
-      { label: 'Returns', to: '/returns', icon: RefreshCcw },
+      { label: 'Returns', to: routes.transactions, icon: RefreshCcw },
       { label: 'Purchase Orders', to: '/purchase-orders', icon: FolderKanban },
       { label: 'Suppliers', to: routes.suppliers, icon: Store },
       { label: 'Marketplace', to: routes.marketplace, icon: Building2 },
@@ -117,14 +117,19 @@ export function sidebarNavGroups(role: 'owner' | 'staff' | null) {
   }));
 }
 
-export function Sidebar() {
-  const collapsed = uiStore((state) => state.sidebarCollapsed);
-  const toggleSidebar = uiStore((state) => state.toggleSidebar);
+type SidebarPanelProps = {
+  collapsed: boolean;
+  drawerMode?: boolean;
+  onToggleCollapse?: () => void;
+  onNavigate?: () => void;
+};
+
+export function SidebarPanel({ collapsed, drawerMode = false, onToggleCollapse, onNavigate }: SidebarPanelProps) {
   const role = authStore((state) => state.role);
   const groups = sidebarNavGroups(role);
 
   return (
-    <aside className={cn('sidebar', collapsed && 'sidebar--collapsed')}>
+    <aside className={cn('sidebar', collapsed && 'sidebar--collapsed', drawerMode && 'sidebar--drawer')}>
       <div className="sidebar__brand">
         <div className="sidebar__logo">R</div>
         {!collapsed ? (
@@ -133,8 +138,13 @@ export function Sidebar() {
             <div className="sidebar__tag">Retail operations hub</div>
           </div>
         ) : null}
-        <button className="sidebar__collapse" type="button" onClick={toggleSidebar} aria-label="Toggle sidebar">
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+        <button
+          className="sidebar__collapse"
+          type="button"
+          onClick={onToggleCollapse}
+          aria-label={drawerMode ? 'Close navigation' : 'Toggle sidebar'}
+        >
+          {drawerMode ? <X size={18} /> : collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
       </div>
 
@@ -147,9 +157,10 @@ export function Sidebar() {
                 const Icon = item.icon;
                 return (
                   <NavLink
-                    key={item.to}
+                    key={`${item.to}-${item.label}`}
                     to={item.to}
                     className={({ isActive }) => cn('sidebar__item', isActive && 'sidebar__item--active')}
+                    onClick={onNavigate}
                   >
                     <Icon className="sidebar__item-icon" />
                     {!collapsed ? <span>{item.label}</span> : null}
@@ -174,4 +185,11 @@ export function Sidebar() {
       </div>
     </aside>
   );
+}
+
+export function Sidebar() {
+  const collapsed = uiStore((state) => state.sidebarCollapsed);
+  const toggleSidebar = uiStore((state) => state.toggleSidebar);
+
+  return <SidebarPanel collapsed={collapsed} onToggleCollapse={toggleSidebar} />;
 }

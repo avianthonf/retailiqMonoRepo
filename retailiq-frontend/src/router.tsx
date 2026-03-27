@@ -4,7 +4,7 @@
  * Last item from Section 11 risks addressed here: Mixed response envelopes
  */
 import { Suspense, type ReactNode } from 'react';
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet, useParams } from 'react-router-dom';
 import { AuthGuard, PublicOnlyGuard, RoleGuard } from '@/utils/guards';
 import { AppShell } from '@/components/layout/AppShell';
 import {
@@ -79,6 +79,11 @@ const suspense = (element: ReactNode) => (
   <Suspense fallback={<div className="app-content">Loading…</div>}>{element}</Suspense>
 );
 
+function LegacyTransactionRedirect() {
+  const params = useParams();
+  return <Navigate to={params.id ? `/orders/transactions/${params.id}` : '/orders/transactions'} replace />;
+}
+
 export const router = createBrowserRouter([
   {
     element: <Outlet />,
@@ -105,6 +110,13 @@ export const router = createBrowserRouter([
             element: <AppShell />,
             children: [
               { path: '/', element: <Navigate to="/dashboard" replace /> },
+              { path: '/orders', element: <Navigate to="/orders/pos" replace /> },
+              { path: '/pos', element: <Navigate to="/orders/pos" replace /> },
+              { path: '/transactions', element: <Navigate to="/orders/transactions" replace /> },
+              { path: '/transactions/:id', element: suspense(<LegacyTransactionRedirect />) },
+              { path: '/orders/pos', element: suspense(<PosPage />) },
+              { path: '/orders/transactions', element: suspense(<TransactionsPage />) },
+              { path: '/orders/transactions/:uuid', element: suspense(<TransactionDetailPage />) },
               { path: '/dashboard', element: suspense(<DashboardPage />) },
               { path: '/dashboard/alerts', element: suspense(<AlertsPage />) },
               { path: '/dashboard/calendar', element: suspense(<CalendarPage />) },
@@ -112,9 +124,6 @@ export const router = createBrowserRouter([
               { path: '/alerts', element: <Navigate to="/dashboard/alerts" replace /> },
               { path: '/financial-calendar', element: <Navigate to="/dashboard/calendar" replace /> },
               { path: '/reports', element: <Navigate to="/dashboard/reports" replace /> },
-              { path: '/pos', element: suspense(<PosPage />) },
-              { path: '/transactions', element: suspense(<TransactionsPage />) },
-              { path: '/transactions/:id', element: suspense(<TransactionDetailPage />) },
               { path: '/inventory', element: suspense(<InventoryPage />) },
               { path: '/inventory/new', element: suspense(<RoleGuard role="owner"><InventoryFormPage /></RoleGuard>) },
               { path: '/inventory/sync', element: suspense(<InventorySyncPage />) },

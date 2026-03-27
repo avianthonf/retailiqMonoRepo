@@ -14,14 +14,17 @@ const items: CommandItem[] = [
   { label: 'Smart Alerts', description: 'Operational alert center', to: routes.dashboardAlerts },
   { label: 'Financial Calendar', description: 'Events and deadlines', to: routes.dashboardCalendar },
   { label: 'Reports', description: 'Exports and launchers', to: routes.dashboardReports },
-  { label: 'Inventory', description: 'Products and stock', to: routes.inventory },
+  { label: 'Point of sale', description: 'Create new sales', to: routes.pos },
   { label: 'Transactions', description: 'Sales and returns', to: routes.transactions },
+  { label: 'Inventory', description: 'Products and stock', to: routes.inventory },
   { label: 'Customers', description: 'Customer records', to: routes.customers },
   { label: 'Analytics', description: 'Reports and insights', to: routes.analytics },
   { label: 'Financials', description: 'Ledger and treasury', to: routes.finance },
   { label: 'AI Assistant', description: 'Ask the assistant', to: routes.ai },
   { label: 'Store Profile', description: 'Business settings', to: routes.settings },
 ];
+
+const recentKey = 'retailiq-command-recent';
 
 interface CommandPaletteProps {
   open: boolean;
@@ -31,10 +34,26 @@ interface CommandPaletteProps {
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [recentItems, setRecentItems] = useState<CommandItem[]>([]);
 
   useEffect(() => {
     if (!open) {
       setQuery('');
+    }
+  }, [open]);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(recentKey);
+      if (!raw) {
+        setRecentItems([]);
+        return;
+      }
+
+      const parsed = JSON.parse(raw) as string[];
+      setRecentItems(parsed.map((to) => items.find((item) => item.to === to)).filter((item): item is CommandItem => Boolean(item)));
+    } catch {
+      setRecentItems([]);
     }
   }, [open]);
 
@@ -60,8 +79,26 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       return items;
     }
 
-    return items.filter((item) => `${item.label} ${item.description}`.toLowerCase().includes(needle));
+    return [...items]
+      .filter((item) => `${item.label} ${item.description}`.toLowerCase().includes(needle))
+      .sort((left, right) => {
+        const leftExact = left.label.toLowerCase().startsWith(needle) ? 0 : 1;
+        const rightExact = right.label.toLowerCase().startsWith(needle) ? 0 : 1;
+        return leftExact - rightExact || left.label.localeCompare(right.label);
+      });
   }, [query]);
+
+  const persistRecent = (item: CommandItem) => {
+    setRecentItems((current) => {
+      const next = [item, ...current.filter((entry) => entry.to !== item.to)].slice(0, 5);
+      try {
+        window.localStorage.setItem(recentKey, JSON.stringify(next.map((entry) => entry.to)));
+      } catch {
+        // ignore storage failures
+      }
+      return next;
+    });
+  };
 
   if (!open) {
     return null;
@@ -72,15 +109,43 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       <div className="command-palette__panel" onClick={(event) => event.stopPropagation()}>
         <div className="command-palette__search">
           <Search size={16} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search pages and actions…" autoFocus />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search pages and actions..."
+            autoFocus
+          />
         </div>
         <div className="command-palette__list">
+          {!query && recentItems.length > 0 ? (
+            <div className="command-palette__section">
+              <div className="command-palette__section-label">Recent</div>
+              {recentItems.map((item) => (
+                <button
+                  key={`recent-${item.to}`}
+                  type="button"
+                  className="command-palette__item"
+                  onClick={() => {
+                    persistRecent(item);
+                    navigate(item.to);
+                    onOpenChange(false);
+                  }}
+                >
+                  <div>{item.label}</div>
+                  <span>{item.description}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <div className="command-palette__section">
+            <div className="command-palette__section-label">{query ? 'Results' : 'All destinations'}</div>
           {filtered.map((item) => (
             <button
               key={item.to}
               type="button"
               className="command-palette__item"
               onClick={() => {
+                persistRecent(item);
                 navigate(item.to);
                 onOpenChange(false);
               }}
@@ -89,8 +154,11 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               <span>{item.description}</span>
             </button>
           ))}
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+export default CommandPalette;

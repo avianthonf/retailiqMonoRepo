@@ -352,6 +352,8 @@ export interface BatchTransactionCreateResponse {
 export interface ListTransactionsRequest {
   page?: number;
   page_size?: number;
+  date_from?: string;
+  date_to?: string;
   start_date?: string;
   end_date?: string;
   payment_mode?: 'CASH' | 'UPI' | 'CARD' | 'CREDIT';

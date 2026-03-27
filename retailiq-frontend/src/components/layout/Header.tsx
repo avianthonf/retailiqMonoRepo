@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Bell, Menu, Search, Slash, UserCircle2 } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Bell, ChevronDown, LogOut, Menu, Search, Slash, UserCircle2 } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { authStore } from '@/stores/authStore';
 import { cn } from '@/utils/cn';
 import { routes } from '@/routes/routes';
+import { useStoreProfileQuery } from '@/hooks/store';
+import { clearSession } from '@/utils/session';
 
 const titleMap: Record<string, string> = {
   [routes.dashboard]: 'Dashboard',
@@ -11,6 +13,7 @@ const titleMap: Record<string, string> = {
   [routes.dashboardCalendar]: 'Financial Calendar',
   [routes.dashboardReports]: 'Reports',
   [routes.inventory]: 'Inventory',
+  [routes.pos]: 'Point of sale',
   [routes.transactions]: 'Transactions',
   [routes.customers]: 'Customers',
   [routes.analytics]: 'Analytics',
@@ -26,13 +29,18 @@ const titleMap: Record<string, string> = {
 
 interface HeaderProps {
   onOpenPalette: () => void;
-  onToggleSidebar: () => void;
+  onMenuClick: () => void;
+  storeName?: string;
 }
 
-export function Header({ onOpenPalette, onToggleSidebar }: HeaderProps) {
+export function Header({ onOpenPalette, onMenuClick, storeName }: HeaderProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const user = authStore((state) => state.user);
+  const storeProfile = useStoreProfileQuery();
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4);
@@ -41,15 +49,27 @@ export function Header({ onOpenPalette, onToggleSidebar }: HeaderProps) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    const onPointerDown = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('mousedown', onPointerDown);
+    return () => window.removeEventListener('mousedown', onPointerDown);
+  }, []);
+
   const title = useMemo(() => {
     const pathname = location.pathname;
     if (pathname.startsWith('/dashboard/alerts')) return 'Smart Alerts';
     if (pathname.startsWith('/dashboard/calendar')) return 'Financial Calendar';
     if (pathname.startsWith('/dashboard/reports')) return 'Reports';
+    if (pathname.startsWith('/orders/pos')) return 'Point of sale';
+    if (pathname.startsWith('/orders/transactions')) return 'Transactions';
     if (pathname.startsWith('/store')) return 'Store Profile';
     if (pathname.startsWith('/inventory')) return 'Inventory';
     if (pathname.startsWith('/purchase-orders')) return 'Purchase Orders';
-    if (pathname.startsWith('/transactions')) return 'Transactions';
     if (pathname.startsWith('/customers')) return 'Customers';
     if (pathname.startsWith('/staff-performance')) return 'Staff Performance';
     if (pathname.startsWith('/market-intelligence')) return 'Market Intelligence';
@@ -70,7 +90,8 @@ export function Header({ onOpenPalette, onToggleSidebar }: HeaderProps) {
     if (pathname.startsWith('/dashboard/calendar')) return ['Dashboard', 'Financial Calendar'];
     if (pathname.startsWith('/dashboard/reports')) return ['Dashboard', 'Reports'];
     if (pathname.startsWith('/inventory')) return ['Inventory'];
-    if (pathname.startsWith('/transactions')) return ['Orders', 'Transactions'];
+    if (pathname.startsWith('/orders/pos')) return ['Orders', 'Point of sale'];
+    if (pathname.startsWith('/orders/transactions')) return ['Orders', 'Transactions'];
     if (pathname.startsWith('/customers')) return ['Customers'];
     if (pathname.startsWith('/analytics')) return ['Analytics'];
     if (pathname.startsWith('/finance')) return ['Financials'];
@@ -78,14 +99,17 @@ export function Header({ onOpenPalette, onToggleSidebar }: HeaderProps) {
     return [title];
   }, [location.pathname, title]);
 
+  const resolvedStoreName = storeName ?? storeProfile.data?.store_name ?? 'RetailIQ Store';
+
   return (
     <header className={cn('header', scrolled && 'header--scrolled')}>
       <div className="header__title">
-        <button className="header__menu" type="button" aria-label="Toggle navigation" onClick={onToggleSidebar}>
+        <button className="header__menu" type="button" aria-label="Toggle navigation" onClick={onMenuClick}>
           <Menu size={18} />
         </button>
         <div>
           <div className="header__eyebrow">Retail operations</div>
+          <div className="header__store">{resolvedStoreName}</div>
           <h1>{title}</h1>
           <div className="header__breadcrumb" aria-label="Breadcrumb">
             {crumbs.map((crumb, index) => (
@@ -105,16 +129,43 @@ export function Header({ onOpenPalette, onToggleSidebar }: HeaderProps) {
       </button>
 
       <div className="header__meta">
+        <div className="header__store-chip" title={resolvedStoreName}>
+          {resolvedStoreName}
+        </div>
         <button className="header__icon" type="button" aria-label="Notifications">
           <Bell size={18} />
           <span className="header__badge">3</span>
         </button>
-        <div className="header__user">
-          <UserCircle2 size={18} />
-          <div>
-            <div className="header__user-name">{user?.full_name ?? user?.email ?? 'Retail user'}</div>
-            <div className="header__user-role">{user?.role ?? 'staff'}</div>
-          </div>
+        <div className="header__user-wrap" ref={menuRef}>
+          <button className="header__user" type="button" aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>
+            <UserCircle2 size={18} />
+            <div>
+              <div className="header__user-name">{user?.full_name ?? user?.email ?? 'Retail user'}</div>
+              <div className="header__user-role">{user?.role ?? 'staff'}</div>
+            </div>
+            <ChevronDown size={14} className="header__user-chevron" />
+          </button>
+          {menuOpen ? (
+            <div className="header__user-menu" role="menu">
+              <div className="header__user-menu-meta">
+                <strong>{user?.full_name ?? 'Retail user'}</strong>
+                <span>{user?.role ?? 'staff'}</span>
+              </div>
+              <button
+                className="header__user-menu-item"
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setMenuOpen(false);
+                  clearSession();
+                  navigate('/login', { replace: true });
+                }}
+              >
+                <LogOut size={16} />
+                Sign out
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </header>
