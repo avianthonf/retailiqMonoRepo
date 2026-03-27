@@ -27,9 +27,10 @@ const titleMap: Record<string, string> = {
   [routes.security]: 'Security / MFA',
   [routes.settings]: 'Store Profile',
   [routes.pricing]: 'Pricing',
-  [routes.decisions]: 'Decisions',
+  [routes.decisions]: 'AI Decisions',
   [routes.kyc]: 'KYC',
   [routes.developer]: 'Developer',
+  [routes.ai]: 'AI Assistant',
   [routes.aiTools]: 'AI Tools',
 };
 
@@ -80,7 +81,9 @@ export function Header({ onOpenPalette, onMenuClick, storeName }: HeaderProps) {
     if (pathname.startsWith('/staff-performance')) return 'Staff Performance';
     if (pathname.startsWith('/market-intelligence')) return 'Market Intelligence';
     if (pathname.startsWith('/e-invoicing')) return 'E-Invoicing';
-    if (pathname.startsWith('/ai-assistant')) return 'AI Assistant';
+    if (pathname.startsWith('/ai/tools')) return 'AI Tools';
+    if (pathname.startsWith('/ai/decisions')) return 'AI Decisions';
+    if (pathname.startsWith('/ai')) return 'AI Assistant';
     if (pathname.startsWith('/finance/accounts')) return 'Accounts';
     if (pathname.startsWith('/finance/credit-score')) return 'Credit Score';
     if (pathname.startsWith('/finance/kyc')) return 'Finance KYC';
@@ -113,6 +116,9 @@ export function Header({ onOpenPalette, onMenuClick, storeName }: HeaderProps) {
     if (pathname.startsWith('/finance/treasury')) return ['Financials', 'Treasury'];
     if (pathname.startsWith('/finance/loans')) return ['Financials', 'Loans'];
     if (pathname.startsWith('/finance')) return ['Financials'];
+    if (pathname.startsWith('/ai/decisions')) return ['AI Assistant', 'AI Decisions'];
+    if (pathname.startsWith('/ai/tools')) return ['AI Assistant', 'AI Tools'];
+    if (pathname.startsWith('/ai')) return ['AI Assistant'];
     if (pathname.startsWith('/store')) return ['Settings', 'Store Profile'];
     return [title];
   }, [location.pathname, title]);

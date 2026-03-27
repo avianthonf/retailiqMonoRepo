@@ -24,6 +24,8 @@ const items: CommandItem[] = [
   { label: 'Finance Credit Score', description: 'Merchant credit score', to: routes.financeCreditScore },
   { label: 'Finance KYC', description: 'Compliance status', to: routes.financeKyc },
   { label: 'AI Assistant', description: 'Ask the assistant', to: routes.ai },
+  { label: 'AI Decisions', description: 'Recommended business actions', to: routes.decisions },
+  { label: 'AI Tools', description: 'Recommendations and vision utilities', to: routes.aiTools },
   { label: 'Store Profile', description: 'Business settings', to: routes.settings },
 ];
 

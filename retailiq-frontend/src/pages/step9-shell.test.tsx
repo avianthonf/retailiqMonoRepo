@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LoginPage from '@/pages/Login';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { authStore } from '@/stores/authStore';
@@ -18,6 +19,8 @@ vi.mock('@/hooks/auth', () => ({
 }));
 
 describe('Prompt 00 step 9 shell verification', () => {
+  const queryClient = new QueryClient();
+
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
@@ -122,11 +125,13 @@ describe('Prompt 00 step 9 shell verification', () => {
     for (const route of routeEntries) {
       cleanup();
       render(
-        <MemoryRouter initialEntries={[route.path]}>
-          <Routes>
-            <Route path={route.path} element={route.element} />
-          </Routes>
-        </MemoryRouter>,
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter initialEntries={[route.path]}>
+            <Routes>
+              <Route path={route.path} element={route.element} />
+            </Routes>
+          </MemoryRouter>
+        </QueryClientProvider>,
       );
 
       expect(screen.getAllByText(route.title).length).toBeGreaterThan(0);

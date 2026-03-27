@@ -3,12 +3,16 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 
 type ImportedClient = typeof import('@/api/client');
 type ImportedStore = typeof import('@/stores/authStore');
+type ImportedKyc = typeof import('@/api/kyc');
+type ImportedI18n = typeof import('@/api/i18n');
 
 describe('Prompt 00 step 9 transport verification', () => {
   let server: http.Server;
   let baseUrl = '';
   let apiClientModule: ImportedClient;
   let authStoreModule: ImportedStore;
+  let kycModule: ImportedKyc;
+  let i18nModule: ImportedI18n;
 
   beforeAll(async () => {
     server = http.createServer(async (req, res) => {
@@ -96,6 +100,115 @@ describe('Prompt 00 step 9 transport verification', () => {
         return;
       }
 
+      if (url === '/api/v1/kyc/kyc/providers' && method === 'GET') {
+        sendJson(404, { success: false, error: 'not found', data: null, meta: null });
+        return;
+      }
+
+      if (url === '/api/v1/kyc/providers' && method === 'GET') {
+        sendJson(200, {
+          success: true,
+          data: [
+            { code: 'GST', name: 'GST', type: 'tax', id_label: 'GSTIN', required_fields: ['gstin'], is_mandatory: true },
+          ],
+          error: null,
+          meta: null,
+        });
+        return;
+      }
+
+      if (url === '/api/v1/kyc/kyc/verify' && method === 'POST') {
+        sendJson(404, { success: false, error: 'not found', data: null, meta: null });
+        return;
+      }
+
+      if (url === '/api/v1/kyc/verify' && method === 'POST') {
+        sendJson(200, {
+          success: true,
+          data: { status: 'VERIFIED', details: { reference_id: 'GSTIN-1' } },
+          error: null,
+          meta: null,
+        });
+        return;
+      }
+
+      if (url === '/api/v1/kyc/kyc/status' && method === 'GET') {
+        sendJson(404, { success: false, error: 'not found', data: null, meta: null });
+        return;
+      }
+
+      if (url === '/api/v1/kyc/status' && method === 'GET') {
+        sendJson(200, {
+          success: true,
+          data: [
+            { provider_name: 'GST', status: 'VERIFIED', country_code: 'IN', verified_at: '2026-03-27T11:00:00.000Z' },
+          ],
+          error: null,
+          meta: null,
+        });
+        return;
+      }
+
+      if (url === '/api/v1/i18n/i18n/translations' && method === 'GET') {
+        sendJson(200, {
+          success: true,
+          data: { locale: 'en-US', catalog: { hello: 'Hello' } },
+          error: null,
+          meta: null,
+        });
+        return;
+      }
+
+      if (url === '/api/v1/i18n/i18n/currencies' && method === 'GET') {
+        sendJson(200, {
+          success: true,
+          data: { data: [{ code: 'INR', name: 'Indian Rupee', symbol: '₹', decimal_places: 2, symbol_position: 'prefix' }] },
+          error: null,
+          meta: null,
+        });
+        return;
+      }
+
+      if (url === '/api/v1/i18n/i18n/countries' && method === 'GET') {
+        sendJson(200, {
+          success: true,
+          data: { data: [{ code: 'IN', name: 'India', default_currency: 'INR', default_locale: 'en-IN', timezone: 'Asia/Kolkata', phone_code: '+91', date_format: 'DD/MM/YYYY' }] },
+          error: null,
+          meta: null,
+        });
+        return;
+      }
+
+      if (url === '/api/v1/i18n/translations' && method === 'GET') {
+        sendJson(200, {
+          success: true,
+          data: { locale: 'en-US', catalog: { hello: 'Hello' } },
+          error: null,
+          meta: null,
+        });
+        return;
+      }
+
+      if (url === '/api/v1/i18n/currencies' && method === 'GET') {
+        sendJson(200, {
+          success: true,
+          data: { data: [{ code: 'INR', name: 'Indian Rupee', symbol: '₹', decimal_places: 2, symbol_position: 'prefix' }] },
+          error: null,
+          meta: null,
+        });
+        return;
+      }
+
+      if (url === '/api/v1/i18n/countries' && method === 'GET') {
+        sendJson(200, {
+          success: true,
+          data: { data: [{ code: 'IN', name: 'India', default_currency: 'INR', default_locale: 'en-IN', timezone: 'Asia/Kolkata', phone_code: '+91', date_format: 'DD/MM/YYYY' }] },
+          error: null,
+          meta: null,
+        });
+        return;
+      }
+
       sendJson(404, { success: false, error: `Unhandled route: ${method} ${url}`, data: null, meta: null });
     });
 
@@ -114,6 +227,8 @@ describe('Prompt 00 step 9 transport verification', () => {
 
     authStoreModule = await import('@/stores/authStore');
     apiClientModule = await import('@/api/client');
+    kycModule = await import('@/api/kyc');
+    i18nModule = await import('@/api/i18n');
   });
 
   beforeEach(() => {
@@ -215,5 +330,30 @@ describe('Prompt 00 step 9 transport verification', () => {
 
     expect(auditResult.items).toHaveLength(1);
     expect(auditResult.items[0]).toEqual({ product_id: 10, counted_quantity: 40, difference: -2 });
+  });
+
+  it('falls back through the KYC alias endpoints', async () => {
+    const providers = await kycModule.listKycProviders();
+    expect(providers.providers).toHaveLength(1);
+    expect(providers.providers[0].code).toBe('GST');
+
+    const verification = await kycModule.verifyKyc({ provider_code: 'GST', tax_id: 'GSTIN-1' } as never);
+    expect(verification.status).toBe('VERIFIED');
+
+    const status = await kycModule.listKycStatus();
+    expect(status.records).toHaveLength(1);
+    expect(status.records[0].provider_name).toBe('GST');
+  });
+
+  it('calls the duplicated i18n routes directly', async () => {
+    const translations = await i18nModule.getTranslations();
+    expect(translations.locale).toBe('en-US');
+    expect(translations.catalog.hello).toBe('Hello');
+
+    const currencies = await i18nModule.getSupportedCurrencies();
+    expect(currencies.data[0].code).toBe('INR');
+
+    const countries = await i18nModule.getSupportedCountries();
+    expect(countries.data[0].code).toBe('IN');
   });
 });

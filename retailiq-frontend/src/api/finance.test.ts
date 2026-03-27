@@ -79,4 +79,27 @@ describe('finance api raw passthrough', () => {
       factors: ['Payments on time'],
     });
   });
+
+  it('keeps treasury endpoints on the raw v2 transport path', async () => {
+    mocks.requestRaw.mockResolvedValueOnce({
+      available: 6100,
+      yield_bps: 42,
+      currency: 'INR',
+    });
+
+    await expect(financeApi.getTreasuryBalance()).resolves.toEqual({
+      total_balance: 6100,
+      available_balance: 6100,
+      reserved_amount: 0,
+      pending_transfers: 0,
+      currency: 'INR',
+      last_updated: expect.any(String),
+      yield_bps: 42,
+    });
+
+    expect(mocks.requestRaw).toHaveBeenCalledWith({
+      url: '/api/v2/finance/treasury/balance',
+      method: 'GET',
+    });
+  });
 });

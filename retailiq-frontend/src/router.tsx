@@ -5,6 +5,7 @@
  */
 import { Suspense, type ReactNode } from 'react';
 import { createBrowserRouter, Navigate, Outlet, useParams } from 'react-router-dom';
+import { routes } from '@/routes/routes';
 import { AuthGuard, PublicOnlyGuard, RoleGuard } from '@/utils/guards';
 import { AppShell } from '@/components/layout/AppShell';
 import {
@@ -87,7 +88,19 @@ function LegacyTransactionRedirect() {
   return <Navigate to={params.id ? `/orders/transactions/${params.id}` : '/orders/transactions'} replace />;
 }
 
-export const router = createBrowserRouter([
+function LegacyAiRedirect() {
+  return <Navigate to={routes.ai} replace />;
+}
+
+function LegacyAiToolsRedirect() {
+  return <Navigate to={routes.aiTools} replace />;
+}
+
+function LegacyDecisionsRedirect() {
+  return <Navigate to={routes.decisions} replace />;
+}
+
+export const appRoutes = [
   {
     element: <Outlet />,
     children: [
@@ -155,10 +168,13 @@ export const router = createBrowserRouter([
               { path: '/staff-performance', element: suspense(<StaffPerformancePage />) },
               { path: '/staff-performance/:userId', element: suspense(<RoleGuard role="owner"><StaffPerformanceDetailPage /></RoleGuard>) },
               { path: '/pricing', element: suspense(<RoleGuard role="owner"><PricingPage /></RoleGuard>) },
-              { path: '/decisions', element: suspense(<RoleGuard role="owner"><DecisionsPage /></RoleGuard>) },
+              { path: routes.decisions, element: suspense(<RoleGuard role="owner"><DecisionsPage /></RoleGuard>) },
               { path: '/e-invoicing', element: suspense(<EInvoicingPage />) },
-              { path: '/ai-assistant', element: suspense(<AiAssistantPage />) },
-              { path: '/ai-assistant/tools', element: suspense(<AiToolsPage />) },
+              { path: routes.ai, element: suspense(<AiAssistantPage />) },
+              { path: routes.aiTools, element: suspense(<AiToolsPage />) },
+              { path: routes.legacyAiAssistant, element: suspense(<LegacyAiRedirect />) },
+              { path: routes.legacyAiTools, element: suspense(<LegacyAiToolsRedirect />) },
+              { path: routes.legacyDecisions, element: suspense(<LegacyDecisionsRedirect />) },
               { path: '/offline', element: suspense(<OfflinePage />) },
               { path: '/marketplace', element: suspense(<MarketplacePage />) },
               { path: '/chain', element: suspense(<ChainPage />) },
@@ -188,4 +204,6 @@ export const router = createBrowserRouter([
       },
     ],
   },
-]);
+];
+
+export const router = createBrowserRouter(appRoutes);
