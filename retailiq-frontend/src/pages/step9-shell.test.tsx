@@ -94,6 +94,7 @@ describe('Prompt 00 step 9 shell verification', () => {
       'Purchase Orders',
       'Suppliers',
       'Marketplace',
+      'Omnichannel',
       'All Customers',
       'Loyalty',
       'Credit',

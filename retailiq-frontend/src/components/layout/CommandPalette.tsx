@@ -17,6 +17,8 @@ const items: CommandItem[] = [
   { label: 'Point of sale', description: 'Create new sales', to: routes.pos },
   { label: 'Transactions', description: 'Sales and returns', to: routes.transactions },
   { label: 'Inventory', description: 'Products and stock', to: routes.inventory },
+  { label: 'Inventory Sync', description: 'Offline snapshot and batch sync', to: routes.inventorySync },
+  { label: 'Omnichannel', description: 'Marketplace and WhatsApp hub', to: routes.omnichannel },
   { label: 'Customers', description: 'Customer records', to: routes.customers },
   { label: 'Analytics', description: 'Reports and insights', to: routes.analytics },
   { label: 'Financials', description: 'Ledger and treasury', to: routes.finance },
@@ -30,6 +32,11 @@ const items: CommandItem[] = [
   { label: 'Categories', description: 'Category management', to: routes.settingsCategories },
   { label: 'Tax Config', description: 'GST mappings', to: routes.settingsTax },
   { label: 'Security / MFA', description: 'Password and MFA', to: routes.settingsSecurity },
+  { label: 'Forecasting', description: 'Demand forecast insights', to: routes.analyticsForecasting },
+  { label: 'Pricing', description: 'Price suggestions and rules', to: routes.inventoryPricing },
+  { label: 'Market Intelligence', description: 'Market signals and trends', to: routes.analyticsMarket },
+  { label: 'Staff Performance', description: 'Team metrics and sessions', to: routes.analyticsStaff },
+  { label: 'Offline Analytics', description: 'Snapshot and sync insights', to: routes.analyticsOffline },
 ];
 
 const recentKey = 'retailiq-command-recent';

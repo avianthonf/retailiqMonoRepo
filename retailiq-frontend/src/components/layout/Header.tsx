@@ -29,11 +29,17 @@ const titleMap: Record<string, string> = {
   [routes.settingsCategories]: 'Categories',
   [routes.settingsTax]: 'Tax Config',
   [routes.pricing]: 'Pricing',
+  [routes.inventoryPricing]: 'Pricing',
   [routes.decisions]: 'AI Decisions',
   [routes.kyc]: 'KYC',
   [routes.developer]: 'Developer',
   [routes.ai]: 'AI Assistant',
   [routes.aiTools]: 'AI Tools',
+  [routes.omnichannel]: 'Omnichannel',
+  [routes.analyticsForecasting]: 'Forecasting',
+  [routes.analyticsMarket]: 'Market Intelligence',
+  [routes.analyticsStaff]: 'Staff Performance',
+  [routes.analyticsOffline]: 'Offline Analytics',
 };
 
 interface HeaderProps {
@@ -81,9 +87,16 @@ export function Header({ onOpenPalette, onMenuClick, storeName }: HeaderProps) {
     if (pathname.startsWith('/settings/security')) return 'Security / MFA';
     if (pathname.startsWith('/settings')) return 'Store Profile';
     if (pathname.startsWith('/store')) return 'Store Profile';
+    if (pathname.startsWith('/inventory/pricing')) return 'Pricing';
     if (pathname.startsWith('/inventory')) return 'Inventory';
+    if (pathname.startsWith('/omnichannel')) return 'Omnichannel';
     if (pathname.startsWith('/purchase-orders')) return 'Purchase Orders';
     if (pathname.startsWith('/customers')) return 'Customers';
+    if (pathname.startsWith('/analytics/forecasting')) return 'Forecasting';
+    if (pathname.startsWith('/analytics/market')) return 'Market Intelligence';
+    if (pathname.startsWith('/analytics/staff')) return 'Staff Performance';
+    if (pathname.startsWith('/analytics/offline')) return 'Offline Analytics';
+    if (pathname.startsWith('/analytics')) return 'Analytics';
     if (pathname.startsWith('/staff-performance')) return 'Staff Performance';
     if (pathname.startsWith('/market-intelligence')) return 'Market Intelligence';
     if (pathname.startsWith('/e-invoicing')) return 'E-Invoicing';
@@ -111,9 +124,15 @@ export function Header({ onOpenPalette, onMenuClick, storeName }: HeaderProps) {
     if (pathname.startsWith('/dashboard/calendar')) return ['Dashboard', 'Financial Calendar'];
     if (pathname.startsWith('/dashboard/reports')) return ['Dashboard', 'Reports'];
     if (pathname.startsWith('/inventory')) return ['Inventory'];
+    if (pathname.startsWith('/inventory/pricing')) return ['Inventory', 'Pricing'];
+    if (pathname.startsWith('/omnichannel')) return ['Orders', 'Omnichannel'];
     if (pathname.startsWith('/orders/pos')) return ['Orders', 'Point of sale'];
     if (pathname.startsWith('/orders/transactions')) return ['Orders', 'Transactions'];
     if (pathname.startsWith('/customers')) return ['Customers'];
+    if (pathname.startsWith('/analytics/forecasting')) return ['Analytics', 'Forecasting'];
+    if (pathname.startsWith('/analytics/market')) return ['Analytics', 'Market Intelligence'];
+    if (pathname.startsWith('/analytics/staff')) return ['Analytics', 'Staff Performance'];
+    if (pathname.startsWith('/analytics/offline')) return ['Analytics', 'Offline Analytics'];
     if (pathname.startsWith('/analytics')) return ['Analytics'];
     if (pathname.startsWith('/finance/accounts')) return ['Financials', 'Accounts'];
     if (pathname.startsWith('/finance/credit-score')) return ['Financials', 'Credit Score'];

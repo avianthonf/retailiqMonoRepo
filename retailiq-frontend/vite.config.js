@@ -35,5 +35,16 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    test: {
+      setupFiles: ['./src/test/setup.ts'],
+      fileParallelism: false,
+      pool: 'forks',
+      poolOptions: {
+        forks: {
+          singleFork: true,
+          execArgv: ['--max-old-space-size=8192'],
+        },
+      },
+    },
   };
 });

@@ -49,6 +49,7 @@ const navGroups: NavGroup[] = [
       { label: 'Purchase Orders', to: '/purchase-orders', icon: FolderKanban },
       { label: 'Suppliers', to: routes.suppliers, icon: Store },
       { label: 'Marketplace', to: routes.marketplace, icon: Building2 },
+      { label: 'Omnichannel', to: routes.omnichannel, icon: Megaphone },
     ],
   },
   {
@@ -64,10 +65,10 @@ const navGroups: NavGroup[] = [
     title: 'Analytics',
     items: [
       { label: 'Business Analytics', to: routes.analytics, icon: BarChart3, ownerOnly: true },
-      { label: 'Market Intelligence', to: '/market-intelligence', icon: Megaphone, ownerOnly: true },
+      { label: 'Market Intelligence', to: routes.analyticsMarket, icon: Megaphone, ownerOnly: true },
       { label: 'Decisions', to: routes.decisions, icon: BrainCircuit, ownerOnly: true },
-      { label: 'Staff Performance', to: routes.staff, icon: Users },
-      { label: 'Offline Data', to: routes.offline, icon: Globe2 },
+      { label: 'Staff Performance', to: routes.analyticsStaff, icon: Users },
+      { label: 'Offline Data', to: routes.analyticsOffline, icon: Globe2 },
     ],
   },
   {
