@@ -3,6 +3,7 @@
  * Backend-aligned WhatsApp adapters
  */
 import { request, requestEnvelope } from './client';
+import type { UpdateWhatsappConfigRequest } from '@/types/api';
 
 const WHATSAPP_BASE = '/api/v1/whatsapp';
 
@@ -203,7 +204,7 @@ export const whatsappApi = {
     };
   },
 
-  updateConfig: async (data: Partial<WhatsAppConfig>): Promise<WhatsAppConfig> => {
+  updateConfig: async (data: UpdateWhatsappConfigRequest): Promise<WhatsAppConfig> => {
     await request<{ message?: string }>({
       url: `${WHATSAPP_BASE}/config`,
       method: 'PUT',

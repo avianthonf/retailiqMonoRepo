@@ -18,7 +18,7 @@ export interface MarketSummary {
 
 export interface PriceSignal {
   id: string;
-  product_id: string;
+  category_id: string;
   product_name: string;
   sku: string;
   current_price: number;
@@ -38,6 +38,7 @@ export interface PriceSignal {
 
 export interface PriceIndex {
   id: string;
+  category_id: string;
   category: string;
   region: string;
   index_value: number;
@@ -183,9 +184,10 @@ export const marketIntelligenceApi = {
   },
 
   getPriceSignals: async (params?: {
-    product_id?: string;
+    category_id?: string;
     category?: string;
     region?: string;
+    signal_type?: string;
     trend?: 'UP' | 'DOWN' | 'STABLE';
     page?: number;
     limit?: number;
@@ -193,6 +195,7 @@ export const marketIntelligenceApi = {
     const response = await request<Array<{
       id?: string | number;
       signal_type?: string;
+      category_id?: string | number;
       region_code?: string;
       value?: number;
       confidence?: number;
@@ -201,6 +204,8 @@ export const marketIntelligenceApi = {
       url: `${MARKET_BASE}/signals`,
       method: 'GET',
       params: {
+        category_id: params?.category_id ?? params?.category,
+        signal_type: params?.signal_type,
         limit: params?.limit,
       },
     });
@@ -208,8 +213,8 @@ export const marketIntelligenceApi = {
     const signals = Array.isArray(response)
       ? response.map((signal) => ({
           id: String(signal.id ?? ''),
-          product_id: params?.product_id ?? '',
-          product_name: `Signal ${signal.id ?? ''}`,
+          category_id: String(signal.category_id ?? params?.category_id ?? params?.category ?? ''),
+          product_name: signal.signal_type ? `${signal.signal_type} signal` : `Signal ${signal.id ?? ''}`,
           sku: '',
           current_price: Number(signal.value ?? 0),
           market_price: Number(signal.value ?? 0),
@@ -242,6 +247,7 @@ export const marketIntelligenceApi = {
   },
 
   getPriceIndices: async (_params?: {
+    category_id?: string;
     category?: string;
     region?: string;
     from_period?: string;
@@ -256,11 +262,15 @@ export const marketIntelligenceApi = {
     }>>({
       url: `${MARKET_BASE}/indices`,
       method: 'GET',
+      params: {
+        category_id: _params?.category_id ?? _params?.category,
+      },
     });
 
     return Array.isArray(response)
       ? response.map((index) => ({
           id: String(index.id ?? ''),
+          category_id: String(index.category_id ?? ''),
           category: String(index.category_id ?? ''),
           region: String(index.region_code ?? ''),
           index_value: Number(index.index_value ?? 0),
@@ -273,25 +283,24 @@ export const marketIntelligenceApi = {
   },
 
   computePriceIndex: async (data: {
-    category: string;
-    region: string;
-    period: string;
+    category_id: string;
     product_ids: string[];
   }): Promise<PriceIndex> => {
     const response = await request<{ category_id?: string | number; new_index?: number }>({
       url: `${MARKET_BASE}/indices/compute`,
       method: 'POST',
-      data: { category_id: data.category },
+      data: { category_id: data.category_id },
     });
 
     return {
       id: `index-${Date.now()}`,
-      category: String(response.category_id ?? data.category),
-      region: data.region,
+      category_id: String(response.category_id ?? data.category_id),
+      category: String(response.category_id ?? data.category_id),
+      region: '',
       index_value: Number(response.new_index ?? 0),
       base_value: 100,
       change_percent: Number(response.new_index ?? 0) - 100,
-      period: data.period,
+      period: '',
       created_at: nowIso(),
     };
   },
@@ -352,6 +361,7 @@ export const marketIntelligenceApi = {
       message: 'Alert acknowledged',
       is_acknowledged: true,
       created_at: nowIso(),
+      region: '',
     };
   },
 
@@ -376,8 +386,6 @@ export const marketIntelligenceApi = {
 
   getDemandForecasts: async (params?: {
     product_id?: string;
-    category?: string;
-    region?: string;
     from_period?: string;
     to_period?: string;
   }): Promise<DemandForecast[]> => {
@@ -423,11 +431,30 @@ export const marketIntelligenceApi = {
       new_competitors: number;
       price_changes: number;
     }[];
-  }> => ({
-    price_trends: [],
-    demand_trends: [],
-    competitor_activity: [],
-  }),
+  }> => {
+    const [indices, summary, competitors] = await Promise.all([
+      marketIntelligenceApi.getPriceIndices(),
+      marketIntelligenceApi.getMarketSummary(_params?.region),
+      marketIntelligenceApi.getCompetitors(_params?.region),
+    ]);
+
+    return {
+      price_trends: indices.map((index) => ({
+        date: index.created_at,
+        average_price: index.index_value,
+        index_value: index.index_value,
+      })),
+      demand_trends: summary.map((item) => ({
+        date: item.last_updated,
+        demand_index: item.demand_index,
+      })),
+      competitor_activity: competitors.map((item) => ({
+        date: item.last_analyzed,
+        new_competitors: 1,
+        price_changes: item.total_products,
+      })),
+    };
+  },
 
   getRecommendations: async (params?: {
     product_id?: string;

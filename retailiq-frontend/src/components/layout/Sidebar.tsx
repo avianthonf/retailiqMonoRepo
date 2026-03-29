@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import { NavLink } from 'react-router-dom';
-import { BarChart3, Boxes, BrainCircuit, Building2, ChevronLeft, ChevronRight, CircleDollarSign, CreditCard, FileText, FolderKanban, Globe2, LayoutDashboard, Megaphone, PackageSearch, ReceiptText, Settings2, ShieldCheck, ShoppingCart, Sparkles, Store, Users, Webhook, Zap } from 'lucide-react';
+import { BarChart3, Boxes, BrainCircuit, Building2, ChevronLeft, ChevronRight, CircleDollarSign, CreditCard, FileText, FolderKanban, Globe2, LayoutDashboard, Megaphone, ReceiptText, ShieldCheck, ShoppingCart, Sparkles, Store, Users, Webhook, Zap } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { uiStore } from '@/stores/uiStore';
 import { authStore } from '@/stores/authStore';
@@ -108,7 +108,7 @@ function RotateIcon({ className }: { className?: string }) {
   return <span className={className}>↺</span>;
 }
 
-export function sidebarNavGroups(role: 'owner' | 'staff' | null) {
+function sidebarNavGroups(role: 'owner' | 'staff' | null) {
   return navGroups.map((group) => ({
     ...group,
     items: group.items.filter((item) => !item.ownerOnly || role === 'owner'),

@@ -2,7 +2,7 @@
  * src/api/developer.ts
  * Backend-aligned developer adapters
  */
-import { request } from './client';
+import { getConfiguredApiBaseUrl, request } from './client';
 
 const DEVELOPER_BASE = '/api/v1/developer';
 
@@ -121,7 +121,7 @@ interface RawWebhook {
 const nowIso = () => new Date().toISOString();
 
 const getBaseUrl = () => {
-  const configured = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
+  const configured = getConfiguredApiBaseUrl();
   if (configured) {
     return configured;
   }

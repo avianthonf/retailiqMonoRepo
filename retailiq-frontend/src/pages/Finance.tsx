@@ -197,12 +197,13 @@ export default function FinancePage() {
   const submitKyc = async () => {
     try {
       await submitKycMutation.mutateAsync({
-        provider: kycForm.provider,
-        document_type: kycForm.document_type,
-        document_number: kycForm.document_number,
-        full_name: kycForm.full_name,
-        date_of_birth: kycForm.date_of_birth,
-        address: kycForm.address,
+        business_type: kycForm.document_type || kycForm.provider,
+        tax_id: kycForm.document_number,
+        document_urls: {
+          holder_name: kycForm.full_name,
+          date_of_birth: kycForm.date_of_birth,
+          address: kycForm.address,
+        },
       });
       addToast({
         title: 'KYC submitted',

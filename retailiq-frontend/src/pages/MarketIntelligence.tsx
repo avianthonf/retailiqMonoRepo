@@ -31,36 +31,32 @@ export default function MarketIntelligencePage() {
   const addToast = uiStore((state) => state.addToast);
   const [activeTab, setActiveTab] = useState<'overview' | 'signals' | 'indices' | 'alerts' | 'competitors' | 'forecasts' | 'recommendations'>('overview');
   const [summaryRegion, setSummaryRegion] = useState('');
-  const [signalProductId, setSignalProductId] = useState('');
-  const [indexCategory, setIndexCategory] = useState('');
-  const [indexRegion, setIndexRegion] = useState('');
-  const [indexPeriod, setIndexPeriod] = useState('');
-  const [indexProductIds, setIndexProductIds] = useState('');
+  const [signalCategoryId, setSignalCategoryId] = useState('');
+  const [signalType, setSignalType] = useState('');
+  const [indexCategoryId, setIndexCategoryId] = useState('');
   const [competitorRegion, setCompetitorRegion] = useState('');
   const [selectedCompetitorId, setSelectedCompetitorId] = useState('');
   const [forecastProductId, setForecastProductId] = useState('');
   const [forecastPeriod, setForecastPeriod] = useState('next_30_days');
-  const [forecastCategory, setForecastCategory] = useState('');
-  const [forecastRegion, setForecastRegion] = useState('');
   const [recommendationType, setRecommendationType] = useState<'PRICING' | 'STOCK' | 'MARKETING' | ''>('');
-  const [recommendationCategory, setRecommendationCategory] = useState('');
-  const [recommendationRegion, setRecommendationRegion] = useState('');
 
   const summaryQuery = useMarketSummaryQuery(summaryRegion || undefined);
-  const signalsQuery = usePriceSignalsQuery(signalProductId ? { product_id: signalProductId } : undefined);
+  const signalsQuery = usePriceSignalsQuery(signalCategoryId || signalType
+    ? {
+        category_id: signalCategoryId || undefined,
+        signal_type: signalType || undefined,
+      }
+    : undefined);
   const indicesQuery = usePriceIndicesQuery();
   const alertsQuery = useMarketAlertsQuery();
   const competitorsQuery = useCompetitorsQuery(competitorRegion || undefined);
   const competitorDetailQuery = useCompetitorDetailQuery(selectedCompetitorId);
   const forecastsQuery = useDemandForecastsQuery({
     product_id: forecastProductId || undefined,
-    category: forecastCategory || undefined,
-    region: forecastRegion || undefined,
+    to_period: forecastPeriod || undefined,
   });
   const recommendationsQuery = useRecommendationsQuery({
     type: recommendationType || undefined,
-    region: recommendationRegion || undefined,
-    category: recommendationCategory || undefined,
   });
 
   const acknowledgeAlertMutation = useAcknowledgeAlertMutation();
@@ -70,6 +66,7 @@ export default function MarketIntelligencePage() {
   const signalColumns = useMemo<Column<PriceSignal>[]>(
     () => [
       { key: 'product_name', header: 'Signal', render: (row) => row.product_name || row.id },
+      { key: 'category_id', header: 'Category', render: (row) => row.category_id || '-' },
       { key: 'region', header: 'Region', render: (row) => row.region || 'Unknown' },
       { key: 'current_price', header: 'Observed Value', render: (row) => formatCurrency(row.current_price) },
       { key: 'trend', header: 'Trend', render: (row) => row.trend },
@@ -80,7 +77,7 @@ export default function MarketIntelligencePage() {
 
   const indexColumns = useMemo<Column<PriceIndex>[]>(
     () => [
-      { key: 'category', header: 'Category', render: (row) => row.category },
+      { key: 'category', header: 'Category', render: (row) => row.category || row.category_id },
       { key: 'region', header: 'Region', render: (row) => row.region || 'Unknown' },
       { key: 'index_value', header: 'Index', render: (row) => row.index_value.toFixed(2) },
       { key: 'change_percent', header: 'Change vs Base', render: (row) => `${row.change_percent.toFixed(2)}%` },
@@ -167,24 +164,21 @@ export default function MarketIntelligencePage() {
   );
 
   const onComputeIndex = async () => {
-    if (!indexCategory.trim() || !indexRegion.trim() || !indexPeriod.trim()) {
-      addToast({ title: 'Missing inputs', message: 'Category, region, and period are required to compute an index.', variant: 'warning' });
+    if (!indexCategoryId.trim()) {
+      addToast({ title: 'Missing input', message: 'Category ID is required to compute an index.', variant: 'warning' });
       return;
     }
 
     try {
       const result = await computeIndexMutation.mutateAsync({
-        category: indexCategory.trim(),
-        region: indexRegion.trim(),
-        period: indexPeriod.trim(),
-        product_ids: indexProductIds.split(',').map((value) => value.trim()).filter(Boolean),
+        category_id: indexCategoryId.trim(),
+        product_ids: [],
       });
       addToast({
         title: 'Index computed',
-        message: `${result.category} in ${result.region} is now ${result.index_value.toFixed(2)}.`,
+        message: `Category ${result.category_id} index is now ${result.index_value.toFixed(2)}.`,
         variant: 'success',
       });
-      setIndexProductIds('');
     } catch (error) {
       addToast({ title: 'Index compute failed', message: normalizeApiError(error).message, variant: 'error' });
     }
@@ -295,14 +289,20 @@ export default function MarketIntelligencePage() {
               <CardHeader>
                 <CardTitle>Signal Filter</CardTitle>
               </CardHeader>
-              <CardContent className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+              <CardContent className="grid gap-4 md:grid-cols-2 md:items-end">
                 <Input
-                  label="Product ID"
-                  value={signalProductId}
-                  onChange={(event) => setSignalProductId(event.target.value)}
-                  placeholder="Optional product identifier"
+                  label="Category ID"
+                  value={signalCategoryId}
+                  onChange={(event) => setSignalCategoryId(event.target.value)}
+                  placeholder="Optional category identifier"
                 />
-                <Button variant="secondary" onClick={() => void signalsQuery.refetch()}>
+                <Input
+                  label="Signal Type"
+                  value={signalType}
+                  onChange={(event) => setSignalType(event.target.value)}
+                  placeholder="PRICE, PRICE_DROP, DEMAND_SPIKE"
+                />
+                <Button className="md:col-span-2 md:w-fit" variant="secondary" onClick={() => void signalsQuery.refetch()}>
                   Refresh signals
                 </Button>
               </CardContent>
@@ -331,11 +331,8 @@ export default function MarketIntelligencePage() {
               <CardHeader>
                 <CardTitle>Compute Price Index</CardTitle>
               </CardHeader>
-              <CardContent className="grid gap-4 md:grid-cols-2">
-                <Input label="Category ID" value={indexCategory} onChange={(event) => setIndexCategory(event.target.value)} placeholder="Category identifier" />
-                <Input label="Region" value={indexRegion} onChange={(event) => setIndexRegion(event.target.value)} placeholder="Region code or name" />
-                <Input label="Period" value={indexPeriod} onChange={(event) => setIndexPeriod(event.target.value)} placeholder="2026-W12" />
-                <Input label="Product IDs" value={indexProductIds} onChange={(event) => setIndexProductIds(event.target.value)} placeholder="Optional comma-separated product IDs" />
+              <CardContent className="grid gap-4 md:grid-cols-1">
+                <Input label="Category ID" value={indexCategoryId} onChange={(event) => setIndexCategoryId(event.target.value)} placeholder="Category identifier" />
                 <div className="md:col-span-2">
                   <Button onClick={() => void onComputeIndex()} loading={computeIndexMutation.isPending}>
                     Compute index
@@ -463,8 +460,6 @@ export default function MarketIntelligencePage() {
               <CardContent className="grid gap-4 md:grid-cols-2">
                 <Input label="Product ID" value={forecastProductId} onChange={(event) => setForecastProductId(event.target.value)} placeholder="Optional product ID" />
                 <Input label="Forecast period" value={forecastPeriod} onChange={(event) => setForecastPeriod(event.target.value)} placeholder="next_30_days" />
-                <Input label="Category" value={forecastCategory} onChange={(event) => setForecastCategory(event.target.value)} placeholder="Optional category" />
-                <Input label="Region" value={forecastRegion} onChange={(event) => setForecastRegion(event.target.value)} placeholder="Optional region" />
                 <div className="md:col-span-2">
                   <Button
                     onClick={() => void (async () => {
@@ -515,7 +510,7 @@ export default function MarketIntelligencePage() {
               <CardHeader>
                 <CardTitle>Recommendation Filters</CardTitle>
               </CardHeader>
-              <CardContent className="grid gap-4 md:grid-cols-3">
+              <CardContent className="grid gap-4 md:grid-cols-1">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">Type</label>
                   <select
@@ -529,8 +524,6 @@ export default function MarketIntelligencePage() {
                     <option value="MARKETING">Marketing</option>
                   </select>
                 </div>
-                <Input label="Category" value={recommendationCategory} onChange={(event) => setRecommendationCategory(event.target.value)} placeholder="Optional category filter" />
-                <Input label="Region" value={recommendationRegion} onChange={(event) => setRecommendationRegion(event.target.value)} placeholder="Optional region filter" />
               </CardContent>
             </Card>
 

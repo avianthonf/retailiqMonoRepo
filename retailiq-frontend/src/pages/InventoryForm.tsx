@@ -74,12 +74,17 @@ export default function InventoryFormPage() {
 
   const onSubmit = handleSubmit(async (values) => {
     setServerMessage(null);
+    // Convert category_id to number if present
+    const payload = {
+      ...values,
+      category_id: values.category_id ? Number(values.category_id) : null,
+    };
     try {
       if (isEditing && productId) {
-        await updateMutation.mutateAsync({ productId, payload: values });
+        await updateMutation.mutateAsync({ productId, payload });
         addToast({ title: 'Product updated', message: 'The inventory item was updated.', variant: 'success' });
       } else {
-        const result = await createMutation.mutateAsync(values);
+        const result = await createMutation.mutateAsync(payload);
         addToast({ title: 'Product created', message: `${result.name} is now in inventory.`, variant: 'success' });
       }
       navigate('/inventory', { replace: true });
@@ -97,7 +102,7 @@ export default function InventoryFormPage() {
     <PageFrame title={isEditing ? 'Edit product' : 'Create product'} subtitle={isEditing ? 'Update an existing inventory item.' : 'Add a new inventory item to your store.'} actions={<button className="button button--secondary" type="button" onClick={() => navigate('/inventory')}>Back</button>}>
       <form className="stack" onSubmit={onSubmit} noValidate>
         <div className="grid grid--2">
-          <label className="field"><span>Name</span><input className="input" {...register('name')} />{errors.name ? <span className="muted">{errors.name.message}</span> : null}</label>
+          <label className="field"><span>Name</span><input className="input" {...register('name')} />{errors.name ? <span className="muted">{String(errors.name.message ?? '')}</span> : null}</label>
           <label className="field"><span>SKU</span><input className="input" {...register('sku_code')} /></label>
         </div>
         <div className="grid grid--3">
@@ -106,8 +111,8 @@ export default function InventoryFormPage() {
           <label className="field"><span>Current stock</span><input className="input" type="number" {...register('current_stock', { valueAsNumber: true })} /></label>
         </div>
         <div className="grid grid--2">
-          <label className="field"><span>Cost price</span><input className="input" type="number" step="0.01" {...register('cost_price', { valueAsNumber: true })} />{errors.cost_price ? <span className="muted">{errors.cost_price.message}</span> : null}</label>
-          <label className="field"><span>Selling price</span><input className="input" type="number" step="0.01" {...register('selling_price', { valueAsNumber: true })} />{errors.selling_price ? <span className="muted">{errors.selling_price.message}</span> : null}</label>
+          <label className="field"><span>Cost price</span><input className="input" type="number" step="0.01" {...register('cost_price', { valueAsNumber: true })} />{errors.cost_price ? <span className="muted">{String(errors.cost_price.message ?? '')}</span> : null}</label>
+          <label className="field"><span>Selling price</span><input className="input" type="number" step="0.01" {...register('selling_price', { valueAsNumber: true })} />{errors.selling_price ? <span className="muted">{String(errors.selling_price.message ?? '')}</span> : null}</label>
         </div>
         <div className="grid grid--3">
           <label className="field"><span>Reorder level</span><input className="input" type="number" {...register('reorder_level', { valueAsNumber: true })} /></label>

@@ -29,7 +29,7 @@ export default function StoreProfilePage() {
       state: '',
       gst_number: '',
       currency_symbol: '',
-      working_days: [],
+      working_days: {},
       opening_time: '',
       closing_time: '',
       timezone: '',
@@ -45,7 +45,7 @@ export default function StoreProfilePage() {
         state: profileQuery.data.state,
         gst_number: profileQuery.data.gst_number,
         currency_symbol: profileQuery.data.currency_symbol,
-        working_days: profileQuery.data.working_days,
+        working_days: profileQuery.data.working_days || {},
         opening_time: profileQuery.data.opening_time,
         closing_time: profileQuery.data.closing_time,
         timezone: profileQuery.data.timezone,
@@ -97,7 +97,17 @@ export default function StoreProfilePage() {
           <label className="field"><span>Closing time</span><input className="input" {...register('closing_time')} /></label>
           <label className="field"><span>Timezone</span><input className="input" {...register('timezone')} /></label>
         </div>
-        <label className="field"><span>Working days</span><input className="input" placeholder="Mon,Tue,Wed" {...register('working_days', { setValueAs: (value) => typeof value === 'string' ? value.split(',').map((day) => day.trim()).filter(Boolean) : value })} /></label>
+        <label className="field"><span>Working days</span><input className="input" placeholder='e.g., {"mon": true, "tue": true}' {...register('working_days', { setValueAs: (value: string) => {
+          if (typeof value !== 'string' || !value.trim()) {
+            return {};
+          }
+
+          try {
+            return JSON.parse(value);
+          } catch {
+            return {};
+          }
+        } })} /></label>
         {errors.root ? <div className="muted">{errors.root.message}</div> : null}
         {serverMessage ? <div className="muted">{serverMessage}</div> : null}
         <button className="button" type="submit" disabled={isSubmitting || updateMutation.isPending}>{isSubmitting || updateMutation.isPending ? 'Saving…' : 'Save store profile'}</button>

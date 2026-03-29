@@ -56,9 +56,9 @@ export interface CreatePurchaseOrderRequest {
   expected_delivery_date?: string;
   notes?: string;
   internal_notes?: string;
-  line_items: Array<{
+  items: Array<{
     product_id: string;
-    quantity: number;
+    ordered_qty: number;
     unit_price: number;
     tax_rate?: number;
     discount_rate?: number;
@@ -71,10 +71,10 @@ export interface UpdatePurchaseOrderRequest {
   expected_delivery_date?: string;
   notes?: string;
   internal_notes?: string;
-  line_items?: Array<{
+  items?: Array<{
     line_item_id?: string;
     product_id: string;
-    quantity: number;
+    ordered_qty: number;
     unit_price: number;
     tax_rate?: number;
     discount_rate?: number;
@@ -307,9 +307,9 @@ export const purchaseOrdersApi = {
         supplier_id: data.supplier_id,
         expected_delivery_date: data.expected_delivery_date,
         notes: data.notes,
-        items: data.line_items.map((item) => ({
+        items: data.items.map((item) => ({
           product_id: item.product_id,
-          ordered_qty: item.quantity,
+          ordered_qty: item.ordered_qty,
           unit_price: item.unit_price,
         })),
       },
@@ -325,9 +325,9 @@ export const purchaseOrdersApi = {
       data: {
         expected_delivery_date: data.expected_delivery_date,
         notes: data.notes,
-        items: data.line_items?.map((item) => ({
+        items: data.items?.map((item) => ({
           product_id: item.product_id,
-          ordered_qty: item.quantity,
+          ordered_qty: item.ordered_qty,
           unit_price: item.unit_price,
         })),
       },

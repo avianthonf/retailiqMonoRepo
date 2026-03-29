@@ -11,7 +11,6 @@ import { transactionSchema, type TransactionFormValues } from '@/types/schemas';
 import { useCreateTransactionMutation } from '@/hooks/transactions';
 import { normalizeApiError } from '@/utils/errors';
 import { extractFieldErrors } from '@/utils/errors';
-import { toApiDate } from '@/utils/dates';
 import { uiStore } from '@/stores/uiStore';
 
 const emptyLineItem = { product_id: 0, quantity: 1, selling_price: 0, discount_amount: 0 };
@@ -24,7 +23,7 @@ export default function PosPage() {
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       transaction_id: crypto.randomUUID(),
-      timestamp: toApiDate(new Date()),
+      timestamp: new Date().toISOString(),
       payment_mode: 'CASH',
       customer_id: null,
       notes: '',

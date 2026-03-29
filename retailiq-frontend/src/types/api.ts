@@ -29,8 +29,10 @@ import type {
   KycRecord,
   LoyaltyProgram,
   MarketplaceCatalogItem,
+  MarketplaceRecommendation,
   MarketplaceOrder,
   MarketplaceRfq,
+  MarketplaceRfqItem,
   MarketplaceTracking,
   NlpResponse,
   OcrJob,
@@ -196,7 +198,7 @@ export interface UpdateStoreProfileRequest {
   state?: string | null;
   gst_number?: string | null;
   currency_symbol?: string | null;
-  working_days?: string[];
+  working_days?: Record<string, boolean>;
   opening_time?: string | null;
   closing_time?: string | null;
   timezone?: string | null;
@@ -535,14 +537,36 @@ export interface ListPurchaseOrdersResponse {
 export type GetPurchaseOrderResponse = PurchaseOrder;
 
 export interface CreatePurchaseOrderRequest {
-  supplier_id: number;
-  items: Array<{ product_id: number; quantity: number; unit_cost: number }>;
+  supplier_id: string;
+  expected_delivery_date?: string;
+  notes?: string;
+  internal_notes?: string;
+  items: Array<{
+    product_id: string;
+    ordered_qty: number;
+    unit_price: number;
+    tax_rate?: number;
+    discount_rate?: number;
+    notes?: string;
+  }>;
 }
 
 export type CreatePurchaseOrderResponse = PurchaseOrder;
 
 export interface UpdatePurchaseOrderRequest {
   status?: string;
+  expected_delivery_date?: string;
+  notes?: string;
+  internal_notes?: string;
+  items?: Array<{
+    line_item_id?: string;
+    product_id: string;
+    ordered_qty: number;
+    unit_price: number;
+    tax_rate?: number;
+    discount_rate?: number;
+    notes?: string;
+  }>;
 }
 
 export type UpdatePurchaseOrderResponse = PurchaseOrder;
@@ -604,6 +628,9 @@ export interface UpdateWhatsappConfigRequest {
   access_token?: string;
   phone_number_id?: string;
   webhook_verify_token?: string;
+  template_namespace?: string;
+  webhook_secret?: string;
+  is_connected?: boolean;
 }
 
 export interface UpdateWhatsappConfigResponse {
@@ -858,23 +885,33 @@ export interface MarketplaceSearchResponse {
   total: number;
 }
 
-export type MarketplaceRecommendationsResponse = MarketplaceCatalogItem[];
+export type MarketplaceRecommendationsResponse = MarketplaceRecommendation[];
 
 export interface CreateRfqRequest {
-  product_name: string;
-  quantity: number;
-  specifications?: string;
+  items: MarketplaceRfqItem[];
 }
 
-export type CreateRfqResponse = MarketplaceRfq;
+export interface CreateRfqResponse {
+  rfq_id: string | number;
+  status: string;
+}
 export type GetRfqResponse = MarketplaceRfq;
 
 export interface CreateMarketplaceOrderRequest {
+  supplier_id: number;
   items: Array<{ catalog_item_id: string; quantity: number }>;
   shipping_address?: string;
+  payment_terms?: string;
+  finance_requested?: boolean;
 }
 
-export type CreateMarketplaceOrderResponse = MarketplaceOrder;
+export interface CreateMarketplaceOrderResponse {
+  order_id: string | number;
+  order_number: string;
+  total: number;
+  status: string;
+  financing_decision?: string | null;
+}
 
 export interface ListMarketplaceOrdersResponse {
   orders: MarketplaceOrder[];

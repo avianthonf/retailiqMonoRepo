@@ -50,9 +50,8 @@ export default function PurchaseOrdersPage() {
     sort_order: 'desc',
   });
 
-  // Check permissions - TODO: Implement proper permission check
   const userRole = authStore.getState().user?.role?.toLowerCase();
-  const canCreatePO = userRole === 'owner' || userRole === 'manager' || userRole === 'store_owner';
+  const canCreatePO = userRole === 'owner';
 
   // Fetch purchase orders
   const { data: purchaseOrdersData, isLoading, error, refetch } = usePurchaseOrdersQuery(filters);

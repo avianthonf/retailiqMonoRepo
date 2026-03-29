@@ -50,12 +50,12 @@ export default function ForgotPasswordPage() {
         <label className="field">
           <span>Email address</span>
           <input className="input" type="email" autoComplete="email" {...register('email')} />
-          {errors.email ? <span className="muted">{errors.email.message}</span> : null}
+          {errors.email ? <span className="muted">{String(errors.email.message ?? '')}</span> : null}
         </label>
         <label className="field">
           <span>Mobile number</span>
           <input className="input" type="tel" autoComplete="tel" {...register('mobile_number')} />
-          {errors.mobile_number ? <span className="muted">{errors.mobile_number.message}</span> : null}
+          {errors.mobile_number ? <span className="muted">{String(errors.mobile_number.message ?? '')}</span> : null}
         </label>
         {serverMessage ? <div className="muted">{serverMessage}</div> : null}
         <div className="button-row">

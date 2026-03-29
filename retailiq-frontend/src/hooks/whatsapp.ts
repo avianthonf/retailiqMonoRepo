@@ -4,8 +4,8 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as whatsappApi from '@/api/whatsapp';
+import type { UpdateWhatsappConfigRequest } from '@/types/api';
 import type { 
-  WhatsAppConfig,
   WhatsAppTemplate,
   WhatsAppCampaign,
 } from '@/api/whatsapp';
@@ -35,7 +35,7 @@ export const useUpdateWhatsAppConfigMutation = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data: Partial<WhatsAppConfig>) => whatsappApi.whatsappApi.updateConfig(data),
+    mutationFn: (data: UpdateWhatsappConfigRequest) => whatsappApi.whatsappApi.updateConfig(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: whatsappKeys.config() });
     },

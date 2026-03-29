@@ -10,12 +10,51 @@ const contactFieldsSchema = z.object({
   mobile_number: z.string().optional().or(z.literal('')),
 });
 
+type LoginSchemaValues = {
+  email?: string;
+  mobile_number?: string;
+  password?: string;
+};
+
+type VerifyOtpSchemaValues = {
+  email?: string;
+  mobile_number?: string;
+  otp: string;
+};
+
+type ResendOtpSchemaValues = {
+  email?: string;
+  mobile_number?: string;
+  purpose?: string;
+};
+
+type ForgotPasswordSchemaValues = {
+  email?: string;
+  mobile_number?: string;
+};
+
+type ProductSchemaValues = {
+  name: string;
+  category_id?: number | null;
+  sku_code?: string | null;
+  uom?: 'pieces' | 'kg' | 'litre' | 'pack';
+  cost_price: number;
+  selling_price: number;
+  current_stock?: number;
+  reorder_level?: number | null;
+  supplier_name?: string | null;
+  barcode?: string | null;
+  image_url?: string | null;
+  lead_time_days?: number | null;
+  hsn_code?: string | null;
+};
+
 /** Oracle sections 12.2 and 12.3 */
 export const loginSchema = z.object({
   email: z.string().email('Enter a valid email address').optional().or(z.literal('')),
   mobile_number: z.string().optional().or(z.literal('')),
   password: z.string().optional().or(z.literal('')),
-}).refine((value) => {
+}).refine((value: LoginSchemaValues) => {
   if (value.email?.trim()) {
     return true;
   }
@@ -41,7 +80,7 @@ export type RegisterFormValues = z.infer<typeof registerSchema>;
 /** Oracle sections 12.2 and 12.3 */
 export const verifyOtpSchema = contactFieldsSchema.extend({
   otp: z.string().min(1, 'OTP is required'),
-}).refine((value) => Boolean(value.email?.trim() || value.mobile_number?.trim()), {
+}).refine((value: VerifyOtpSchemaValues) => Boolean(value.email?.trim() || value.mobile_number?.trim()), {
   message: 'Provide either an email address or a mobile number',
   path: ['email'],
 });
@@ -52,14 +91,14 @@ export const resendOtpSchema = contactFieldsSchema.extend({
   email: z.string().email('Enter a valid email address').optional().or(z.literal('')),
   mobile_number: z.string().optional().or(z.literal('')),
   purpose: z.string().optional(),
-}).refine((value) => Boolean(value.email?.trim() || value.mobile_number?.trim()), {
+}).refine((value: ResendOtpSchemaValues) => Boolean(value.email?.trim() || value.mobile_number?.trim()), {
   message: 'Provide either an email address or a mobile number',
   path: ['email'],
 });
 export type ResendOtpFormValues = z.infer<typeof resendOtpSchema>;
 
 /** Oracle sections 12.2 and 12.3 */
-export const forgotPasswordSchema = contactFieldsSchema.refine((value) => Boolean(value.email?.trim() || value.mobile_number?.trim()), {
+export const forgotPasswordSchema = contactFieldsSchema.refine((value: ForgotPasswordSchemaValues) => Boolean(value.email?.trim() || value.mobile_number?.trim()), {
   message: 'Provide either an email address or a mobile number',
   path: ['email'],
 });
@@ -92,7 +131,7 @@ export const storeProfileSchema = z.object({
   state: z.string().nullable().optional(),
   gst_number: z.string().nullable().optional(),
   currency_symbol: z.string().nullable().optional(),
-  working_days: z.array(z.string()).optional(),
+  working_days: z.record(z.boolean()).optional(),
   opening_time: z.string().nullable().optional(),
   closing_time: z.string().nullable().optional(),
   timezone: z.string().nullable().optional(),
@@ -132,7 +171,7 @@ export const productSchema = z.object({
   image_url: z.string().nullable().optional(),
   lead_time_days: z.number().nonnegative().nullable().optional(),
   hsn_code: z.string().nullable().optional(),
-}).refine((value) => value.selling_price >= value.cost_price, {
+}).refine((value: ProductSchemaValues) => value.selling_price >= value.cost_price, {
   message: 'Selling price must be greater than or equal to cost price',
   path: ['selling_price'],
 });
@@ -170,7 +209,7 @@ export type TransactionLineItemFormValues = z.infer<typeof transactionLineItemSc
 /** Oracle sections 12.3 */
 export const transactionSchema = z.object({
   transaction_id: z.string().uuid('Transaction ID must be a UUID'),
-  timestamp: z.string().min(1, 'Timestamp is required'),
+  timestamp: z.string().datetime('Invalid datetime format'),
   payment_mode: z.enum(['CASH', 'UPI', 'CARD', 'CREDIT']),
   customer_id: z.number().nullable().optional(),
   notes: z.string().nullable().optional(),
@@ -249,11 +288,16 @@ export type SupplierFormValues = z.infer<typeof supplierSchema>;
 
 /** Oracle sections 12.3 */
 export const purchaseOrderSchema = z.object({
-  supplier_id: z.number(),
+  supplier_id: z.string().min(1, 'Supplier is required'),
+  expected_delivery_date: z.string().optional(),
+  notes: z.string().optional(),
   items: z.array(z.object({
-    product_id: z.number(),
-    quantity: z.number().int().positive(),
-    unit_cost: z.number().nonnegative(),
+    product_id: z.string().min(1, 'Product is required'),
+    ordered_qty: z.number().int().positive(),
+    unit_price: z.number().nonnegative(),
+    tax_rate: z.number().nonnegative().optional(),
+    discount_rate: z.number().nonnegative().optional(),
+    notes: z.string().optional(),
   })).min(1, 'At least one purchase order item is required'),
 });
 export type PurchaseOrderFormValues = z.infer<typeof purchaseOrderSchema>;

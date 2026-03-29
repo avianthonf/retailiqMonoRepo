@@ -113,23 +113,23 @@ export default function LoginPage() {
           <label className="field">
             <span>Email address</span>
             <input className="input" type="email" autoComplete="email" {...register('email')} />
-            {errors.email ? <span className="muted">{errors.email.message}</span> : null}
+            {errors.email ? <span className="muted">{String(errors.email.message ?? '')}</span> : null}
           </label>
         ) : (
           <>
             <label className="field">
               <span>Mobile number</span>
               <input className="input" type="tel" autoComplete="tel" {...register('mobile_number')} />
-              {errors.mobile_number ? <span className="muted">{errors.mobile_number.message}</span> : null}
+              {errors.mobile_number ? <span className="muted">{String(errors.mobile_number.message ?? '')}</span> : null}
             </label>
             <label className="field">
               <span>Password</span>
               <input className="input" type="password" autoComplete="current-password" {...register('password')} />
-              {errors.password ? <span className="muted">{errors.password.message}</span> : null}
+              {errors.password ? <span className="muted">{String(errors.password.message ?? '')}</span> : null}
             </label>
           </>
         )}
-        {errors.root ? <div className="muted">{errors.root.message}</div> : null}
+        {errors.root ? <div className="muted">{String(errors.root.message ?? '')}</div> : null}
         {serverMessage ? <div className="muted">{serverMessage}</div> : null}
         <div className="button-row">
           <button className="button" type="submit" disabled={isSubmitting || loginMutation.isPending}>

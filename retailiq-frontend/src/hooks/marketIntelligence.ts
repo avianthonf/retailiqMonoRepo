@@ -31,9 +31,10 @@ export const useMarketSummaryQuery = (region?: string) => {
 
 // Price Signals
 export const usePriceSignalsQuery = (params?: {
-  product_id?: string;
+  category_id?: string;
   category?: string;
   region?: string;
+  signal_type?: string;
   trend?: 'UP' | 'DOWN' | 'STABLE';
   page?: number;
   limit?: number;
@@ -47,6 +48,7 @@ export const usePriceSignalsQuery = (params?: {
 
 // Price Indices
 export const usePriceIndicesQuery = (params?: {
+  category_id?: string;
   category?: string;
   region?: string;
   from_period?: string;
@@ -64,9 +66,7 @@ export const useComputePriceIndexMutation = () => {
   
   return useMutation({
     mutationFn: (data: {
-      category: string;
-      region: string;
-      period: string;
+      category_id: string;
       product_ids: string[];
     }) => marketIntelligenceApi.marketIntelligenceApi.computePriceIndex(data),
     onSuccess: () => {
@@ -124,8 +124,6 @@ export const useCompetitorDetailQuery = (competitorId: string) => {
 // Demand Forecasting
 export const useDemandForecastsQuery = (params?: {
   product_id?: string;
-  category?: string;
-  region?: string;
   from_period?: string;
   to_period?: string;
 }) => {

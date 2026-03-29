@@ -17,12 +17,9 @@ export interface KYCRecord {
 }
 
 export interface KYCSubmission {
-  provider: string;
-  document_type: string;
-  document_number: string;
-  full_name: string;
-  date_of_birth: string;
-  address: string;
+  business_type: string;
+  tax_id: string;
+  document_urls: Record<string, string>;
 }
 
 export interface CreditScore {
@@ -234,23 +231,15 @@ export const financeApi = {
     const response = await request<{ status?: string }>({
       url: `${FINANCE_BASE}/kyc/submit`,
       method: 'POST',
-      data: {
-        business_type: data.document_type || data.provider,
-        tax_id: data.document_number,
-        document_urls: {
-          holder_name: data.full_name,
-          date_of_birth: data.date_of_birth,
-          address: data.address,
-        },
-      },
+      data,
     });
 
     return {
-      id: `kyc-${data.document_number}`,
-      provider: data.provider,
+      id: `kyc-${data.tax_id}`,
+      provider: data.business_type,
       status: mapKycStatus(response.status),
       submitted_at: nowIso(),
-      reference_id: data.document_number,
+      reference_id: data.tax_id,
     };
   },
 
@@ -469,7 +458,7 @@ export const financeApi = {
       url: `${FINANCE_BASE}/treasury/sweep-config`,
       method: 'PUT',
       data: {
-        strategy: data.auto_transfer_enabled ? 'AUTO' : 'MANUAL',
+        strategy: data.auto_transfer_enabled ? (data.strategy ?? 'AUTO') : 'OFF',
         min_balance: data.daily_transfer_limit ?? 0,
       },
     });

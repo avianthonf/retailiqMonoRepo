@@ -20,6 +20,7 @@ import {
   useEmailPurchaseOrderMutation,
 } from '@/hooks/purchaseOrders';
 import { useSuppliersQuery } from '@/hooks/suppliers';
+import { resolveApiUrl } from '@/api/client';
 import type { BadgeProps } from '@/components/ui/Badge';
 import type { Supplier } from '@/api/suppliers';
 import type { ApiError } from '@/types/api';
@@ -105,14 +106,6 @@ export default function PurchaseOrderDetailPage() {
         // Error handled by mutation
       }
     }
-  };
-
-  const resolveApiUrl = (path: string) => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
-    if (!baseUrl) {
-      return path;
-    }
-    return new URL(path, `${baseUrl}/`).toString();
   };
 
   const handleDownloadPdf = async () => {

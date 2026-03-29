@@ -38,7 +38,6 @@ const purchaseOrderSchema = z.object({
   supplier_id: z.string().min(1, 'Supplier is required'),
   expected_delivery_date: z.string().optional(),
   notes: z.string().optional(),
-  internal_notes: z.string().optional(),
   line_items: z.array(lineItemSchema).min(1, 'At least one line item is required'),
 });
 
@@ -117,12 +116,27 @@ export function PurchaseOrderForm({ purchaseOrderId, initialData, onSuccess, onC
   // Handle form submission
   const onSubmit = async (data: FormData) => {
     try {
+      const items = data.line_items.map((item) => ({
+        product_id: item.product_id,
+        ordered_qty: item.quantity,
+        unit_price: item.unit_price,
+      }));
+
       const result = purchaseOrderId
         ? await updateMutation.mutateAsync({
             purchaseOrderId,
-            data,
+            data: {
+              expected_delivery_date: data.expected_delivery_date,
+              notes: data.notes,
+              items,
+            },
           })
-        : await createMutation.mutateAsync(data);
+        : await createMutation.mutateAsync({
+            supplier_id: data.supplier_id,
+            expected_delivery_date: data.expected_delivery_date,
+            notes: data.notes,
+            items,
+          });
       onSuccess?.(result.purchase_order_id);
       if (!onSuccess) {
         navigate(`/purchase-orders/${result.purchase_order_id}`);
@@ -206,7 +220,7 @@ export function PurchaseOrderForm({ purchaseOrderId, initialData, onSuccess, onC
               )}
             />
             {errors.supplier_id && (
-              <p className="text-sm text-red-600 mt-1">{errors.supplier_id.message}</p>
+              <p className="text-sm text-red-600 mt-1">{String(errors.supplier_id.message ?? '')}</p>
             )}
           </div>
 
@@ -251,22 +265,6 @@ export function PurchaseOrderForm({ purchaseOrderId, initialData, onSuccess, onC
                   rows={2}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Notes for supplier..."
-                />
-              )}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Internal Notes</label>
-            <Controller
-              name="internal_notes"
-              control={control}
-              render={({ field }) => (
-                <textarea
-                  {...field}
-                  rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Internal notes..."
                 />
               )}
             />
@@ -325,7 +323,7 @@ export function PurchaseOrderForm({ purchaseOrderId, initialData, onSuccess, onC
                     />
                     {errors.line_items?.[index]?.product_id && (
                       <p className="text-sm text-red-600 mt-1">
-                        {errors.line_items[index]?.product_id?.message}
+                        {String(errors.line_items[index]?.product_id?.message ?? '')}
                       </p>
                     )}
                   </div>
@@ -346,7 +344,7 @@ export function PurchaseOrderForm({ purchaseOrderId, initialData, onSuccess, onC
                     />
                     {errors.line_items?.[index]?.quantity && (
                       <p className="text-sm text-red-600 mt-1">
-                        {errors.line_items[index]?.quantity?.message}
+                        {String(errors.line_items[index]?.quantity?.message ?? '')}
                       </p>
                     )}
                   </div>
@@ -368,7 +366,7 @@ export function PurchaseOrderForm({ purchaseOrderId, initialData, onSuccess, onC
                     />
                     {errors.line_items?.[index]?.unit_price && (
                       <p className="text-sm text-red-600 mt-1">
-                        {errors.line_items[index]?.unit_price?.message}
+                        {String(errors.line_items[index]?.unit_price?.message ?? '')}
                       </p>
                     )}
                   </div>
@@ -467,10 +465,10 @@ export function PurchaseOrderForm({ purchaseOrderId, initialData, onSuccess, onC
       {/* Actions */}
       <div className="flex justify-end space-x-4">
         {onCancel && (
-        <Button type="button" onClick={onCancel} variant="secondary">
-          Cancel
-        </Button>
-      )}
+          <Button type="button" onClick={onCancel} variant="secondary">
+            Cancel
+          </Button>
+        )}
         <Button type="submit" loading={isSubmitting}>
           {purchaseOrderId ? 'Save Purchase Order' : 'Create Purchase Order'}
         </Button>

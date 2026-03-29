@@ -15,7 +15,14 @@ import type { AuthTokens } from '@/types/models';
 import { normalizeApiError } from '@/utils/errors';
 import { clearStoredRefreshToken, getStoredRefreshToken, setStoredRefreshToken } from '@/utils/tokenStorage';
 
-const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+type ApiEnvironment = {
+  VITE_API_BASE_URL?: string;
+};
+
+export const getConfiguredApiBaseUrl = (env: ApiEnvironment = import.meta.env as ApiEnvironment) =>
+  (env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+const BASE_URL = getConfiguredApiBaseUrl();
 let refreshPromise: Promise<AuthTokens | null> | null = null;
 let redirecting = false;
 
@@ -28,7 +35,23 @@ export const apiClient = axios.create({
   withCredentials: false,
 });
 
-const resolveUrl = (url: string) => (url.startsWith('http://') || url.startsWith('https://') ? url : `${BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`);
+export const resolveApiUrl = (url: string, baseUrl = BASE_URL) => {
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+
+  const normalizedPath = url.startsWith('/') ? url : `/${url}`;
+
+  if (baseUrl) {
+    return `${baseUrl}${normalizedPath}`;
+  }
+
+  if (typeof window !== 'undefined') {
+    return new URL(normalizedPath, window.location.origin).toString();
+  }
+
+  return normalizedPath;
+};
 
 const isFormData = (value: unknown): value is FormData => typeof FormData !== 'undefined' && value instanceof FormData;
 
@@ -128,7 +151,7 @@ const requestRefreshToken = async (): Promise<AuthTokens | null> => {
     return null;
   }
 
-  const response = await axios.post(resolveUrl('/api/v1/auth/refresh'), { refresh_token }, {
+  const response = await axios.post(resolveApiUrl('/api/v1/auth/refresh'), { refresh_token }, {
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',

@@ -46,7 +46,7 @@ export interface StoreProfile {
   state: string | null;
   gst_number: string | null;
   currency_symbol: string | null;
-  working_days: string[];
+  working_days: Record<string, boolean>;
   opening_time: string | null;
   closing_time: string | null;
   timezone: string | null;
@@ -418,18 +418,41 @@ export interface MarketplaceCatalogItem {
   name: string;
   category: string;
   price: number;
+  moq?: number;
   supplier_name: string;
   rating: number;
   image_url: string | null;
 }
 
-export interface MarketplaceRfq {
+export interface MarketplaceRecommendation {
   id: string;
   product_name: string;
+  category: string;
+  urgency: string;
+  suggested_qty: number;
+  suggested_supplier_id: string | number | null;
+}
+
+export interface MarketplaceRfqItem {
+  product_name: string;
   quantity: number;
+  specifications?: string;
+}
+
+export interface MarketplaceRfq {
+  id: string;
+  items: MarketplaceRfqItem[];
   status: string;
+  matched_suppliers_count: number;
   created_at: string;
-  responses: number;
+  responses: Array<{
+    id: string | number;
+    supplier_profile_id: string | number;
+    quoted_items: unknown;
+    total_price: number;
+    delivery_days: number;
+    status: string;
+  }>;
 }
 
 export interface MarketplaceOrder {
@@ -437,7 +460,15 @@ export interface MarketplaceOrder {
   order_number: string;
   status: string;
   total: number;
-  supplier_name: string;
+  supplier_name?: string;
+  supplier_profile_id?: string | number;
+  payment_status?: string;
+  financed?: boolean;
+  expected_delivery?: string;
+  subtotal?: number;
+  tax?: number;
+  shipping_cost?: number;
+  loan_id?: string | number | null;
   created_at: string;
   items: Array<{ product_name: string; quantity: number; unit_price: number }>;
 }
@@ -445,7 +476,7 @@ export interface MarketplaceOrder {
 export interface MarketplaceTracking {
   order_id: string;
   status: string;
-  events: Array<{ timestamp: string; status: string; location: string; description: string }>;
+  events: Array<{ timestamp: string; status: string; location: string; description?: string; provider?: string; eta?: string; delivered?: boolean }>;
 }
 
 export interface NlpResponse {

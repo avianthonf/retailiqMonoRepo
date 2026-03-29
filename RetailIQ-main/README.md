@@ -69,6 +69,8 @@ alembic upgrade head
 flask run --port 5000
 ```
 
+If you already created the `postgres_data` volume with older Postgres credentials, run `docker compose down -v` once before step 3 so Postgres reinitializes with the `retailiq_admin` bootstrap role from `.env.example`.
+
 ### Railway Deployment
 
 The app deploys via `Dockerfile.railway` → `scripts/start_combined.sh` which runs:

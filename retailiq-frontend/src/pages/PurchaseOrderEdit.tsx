@@ -53,7 +53,6 @@ export default function PurchaseOrderEditPage() {
     supplier_id: purchaseOrder.supplier_id,
     expected_delivery_date: purchaseOrder.expected_delivery_date ?? '',
     notes: purchaseOrder.notes ?? '',
-    internal_notes: purchaseOrder.internal_notes ?? '',
     line_items: purchaseOrder.line_items.map((item) => ({
       product_id: item.product_id,
       quantity: item.quantity,

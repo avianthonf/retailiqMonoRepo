@@ -87,18 +87,18 @@ export default function VerifyOtpPage() {
         <label className="field">
           <span>Email address</span>
           <input className="input" type="email" autoComplete="email" {...register('email')} />
-          {errors.email ? <span className="muted">{errors.email.message}</span> : null}
+          {errors.email ? <span className="muted">{String(errors.email.message ?? '')}</span> : null}
         </label>
         <label className="field">
           <span>Mobile number</span>
           <input className="input" type="tel" autoComplete="tel" {...register('mobile_number')} />
-          {errors.mobile_number ? <span className="muted">{errors.mobile_number.message}</span> : null}
+          {errors.mobile_number ? <span className="muted">{String(errors.mobile_number.message ?? '')}</span> : null}
         </label>
         {noticeMessage ? <div className="muted">{noticeMessage}</div> : null}
         <label className="field">
           <span>OTP</span>
           <input className="input" inputMode="numeric" autoComplete="one-time-code" {...register('otp')} />
-          {errors.otp ? <span className="muted">{errors.otp.message}</span> : null}
+          {errors.otp ? <span className="muted">{String(errors.otp.message ?? '')}</span> : null}
         </label>
         {serverMessage ? <div className="muted">{serverMessage}</div> : null}
         <div className="button-row">

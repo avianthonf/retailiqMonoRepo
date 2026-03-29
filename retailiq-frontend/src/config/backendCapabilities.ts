@@ -13,9 +13,9 @@ export const backendCapabilities = {
     hsnMappings: true,
   },
   marketIntelligence: {
-    competitors: false,
-    forecasts: false,
-    recommendations: false,
+    competitors: true,
+    forecasts: true,
+    recommendations: true,
   },
   finance: {
     kycSubmission: true,
