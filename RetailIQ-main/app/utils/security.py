@@ -4,6 +4,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+_DEFAULT_DEV_DB_PATTERNS = (
+    "retailiq:retailiq@",
+    "retailiq_admin:retailiq_admin_dev@",
+)
+
 
 def generate_mfa_secret() -> str:
     """Generate a base32-encoded TOTP secret."""
@@ -150,7 +155,7 @@ def check_production_readiness():
 
     # 2. Check DATABASE_URL for default credentials
     db_url = current_app.config.get("SQLALCHEMY_DATABASE_URI", "")
-    if db_url and "retailiq:retailiq" in db_url:
+    if db_url and any(pattern in db_url for pattern in _DEFAULT_DEV_DB_PATTERNS):
         raise RuntimeError("default dev credentials")
 
     # 3. Check JWT keys if RS256 is used (placeholder check for the test)

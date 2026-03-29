@@ -5,6 +5,13 @@ import logging
 import os
 import sys
 import time
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import LOCAL_POSTGRES_DOCKER_HOST, build_postgres_url
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -14,7 +21,7 @@ RETRY_INTERVAL = 2
 
 
 def wait_for_db():
-    db_url = os.environ.get("DATABASE_URL", "")
+    db_url = os.environ.get("DATABASE_URL") or build_postgres_url(host=LOCAL_POSTGRES_DOCKER_HOST)
     if not db_url:
         logger.warning("DATABASE_URL not set, skipping DB wait")
         return

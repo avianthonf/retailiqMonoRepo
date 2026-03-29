@@ -56,20 +56,17 @@ RetailIQ is the Flask backend for the RetailIQ retail operating system. This rep
 # 1. Install dependencies
 pip install -r requirements-core.txt
 
-# 2. Set up .env (copy from .env.example)
-cp .env.example .env
-
-# 3. Start PostgreSQL + Redis (Docker)
+# 2. Start PostgreSQL + Redis (Docker)
 docker-compose up -d
 
-# 4. Run migrations
+# 3. Run migrations
 alembic upgrade head
 
-# 5. Start dev server
+# 4. Start dev server
 flask run --port 5000
 ```
 
-If you already created the `postgres_data` volume with older Postgres credentials, run `docker compose down -v` once before step 3 so Postgres reinitializes with the `retailiq_admin` bootstrap role from `.env.example`.
+If you want to override the built-in local Postgres bootstrap values, copy `.env.example` to `.env` before step 2. If you already created the `postgres_data` volume with older Postgres credentials, run `docker compose down -v` once so Postgres reinitializes with the `retailiq_admin` bootstrap role from `.env.example`.
 
 ### Railway Deployment
 

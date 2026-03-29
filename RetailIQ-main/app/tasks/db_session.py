@@ -10,6 +10,8 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from config import LOCAL_POSTGRES_DOCKER_HOST, build_postgres_url
+
 _engine = None
 _Session = None
 
@@ -17,7 +19,7 @@ _Session = None
 def _get_session_factory():
     global _engine, _Session
     if _Session is None:
-        db_url = os.environ.get("DATABASE_URL", "postgresql://retailiq:retailiq@postgres:5432/retailiq")
+        db_url = os.environ.get("DATABASE_URL", build_postgres_url(host=LOCAL_POSTGRES_DOCKER_HOST))
         kwargs = {"pool_pre_ping": True}
         if not db_url.startswith("sqlite"):
             kwargs["pool_size"] = 5

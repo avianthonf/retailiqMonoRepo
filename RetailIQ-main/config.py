@@ -16,6 +16,25 @@ def _first_env(*names: str, default: str = "") -> str:
     return default
 
 
+LOCAL_POSTGRES_USER = "retailiq_admin"
+LOCAL_POSTGRES_PASSWORD = "retailiq_admin_dev"
+LOCAL_POSTGRES_DB = "retailiq"
+LOCAL_POSTGRES_TEST_DB = "retailiq_test"
+LOCAL_POSTGRES_HOST = "localhost"
+LOCAL_POSTGRES_DOCKER_HOST = "postgres"
+LOCAL_POSTGRES_PORT = "5432"
+LEGACY_POSTGRES_USER = "retailiq"
+LEGACY_POSTGRES_PASSWORD = "retailiq"
+
+
+def build_postgres_url(host: str = LOCAL_POSTGRES_HOST, db_name: str | None = None) -> str:
+    user = _first_env("POSTGRES_USER", default=LOCAL_POSTGRES_USER)
+    password = _first_env("POSTGRES_PASSWORD", default=LOCAL_POSTGRES_PASSWORD)
+    resolved_db = db_name if db_name is not None else _first_env("POSTGRES_DB", default=LOCAL_POSTGRES_DB)
+    port = _first_env("POSTGRES_PORT", default=LOCAL_POSTGRES_PORT)
+    return f"postgresql://{user}:{password}@{host}:{port}/{resolved_db}"
+
+
 class Config:
     # ── Flask Core ────────────────────────────────────────────────────────────
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
@@ -23,7 +42,7 @@ class Config:
     TESTING = False
 
     # ── Database ──────────────────────────────────────────────────────────────
-    DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://retailiq:retailiq@localhost:5432/retailiq")
+    DATABASE_URL = os.environ.get("DATABASE_URL", build_postgres_url())
     # SQLAlchemy uses SQLALCHEMY_DATABASE_URI
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -98,17 +117,14 @@ class TestingConfig(Config):
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "TEST_DATABASE_URL", "postgresql://retailiq:retailiq@localhost:5432/retailiq_test"
+        "TEST_DATABASE_URL", build_postgres_url(db_name=LOCAL_POSTGRES_TEST_DB)
     )
     RATELIMIT_ENABLED = False
 
 
 class ProductionConfig(Config):
     DEBUG = False
-    # Force reading from env in prod
-    SECRET_KEY = os.environ.get("SECRET_KEY") or (_ for _ in ()).throw(
-        RuntimeError("SECRET_KEY environment variable is required in production")
-    )
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,

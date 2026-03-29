@@ -275,7 +275,7 @@ def test_production_refuses_default_db_credentials(monkeypatch):
         m.setenv("FLASK_ENV", "production")
         m.setenv("ENVIRONMENT", "production")
         m.setenv("SECRET_KEY", "STRONG_SECRET_FOR_PROD_TEST_1234567890!")
-        m.setenv("DATABASE_URL", "postgresql://retailiq:retailiq@localhost:5432/retailiq")
+        m.setenv("DATABASE_URL", "postgresql://retailiq_admin:retailiq_admin_dev@localhost:5432/retailiq")
 
         # Explicit config to be 100% sure
         with pytest.raises(RuntimeError) as exc_info:
@@ -284,7 +284,7 @@ def test_production_refuses_default_db_credentials(monkeypatch):
                     "TESTING": False,
                     "ENVIRONMENT": "production",
                     "SECRET_KEY": "STRONG_SECRET_FOR_PROD_TEST_1234567890!",
-                    "SQLALCHEMY_DATABASE_URI": "postgresql://retailiq:retailiq@localhost:5432/retailiq",
+                    "SQLALCHEMY_DATABASE_URI": "postgresql://retailiq_admin:retailiq_admin_dev@localhost:5432/retailiq",
                     "EMAIL_ENABLED": True,
                     "SMTP_USER": "test@example.com",
                     "SMTP_PASSWORD": "password",
