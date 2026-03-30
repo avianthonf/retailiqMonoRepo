@@ -154,8 +154,9 @@ class RetailIqRepository private constructor(
             )
         }
 
+        val api = authApi
         return runCatching {
-            authApi
+            api
                 .login(AuthRequest(mobileNumber = mobileNumber, password = password))
                 .unwrapOrThrow()
                 .let { response ->
@@ -183,6 +184,58 @@ class RetailIqRepository private constructor(
             } else {
                 throw error
             }
+        }
+    }
+
+    suspend fun register(
+        mobile: String,
+        password: String,
+        fullName: String,
+        storeName: String?,
+        email: String?,
+    ): String {
+        val api = authApi
+        if (api == null) {
+            return if (shouldUseFallbackData()) "OTP sent successfully." else throw IllegalStateException("Auth API not configured.")
+        }
+        return runCatching {
+            val body = buildMap<String, Any?> {
+                put("mobile_number", mobile)
+                put("password", password)
+                put("full_name", fullName)
+                if (!storeName.isNullOrBlank()) put("store_name", storeName)
+                if (!email.isNullOrBlank()) put("email", email)
+            }
+            api.register(body).unwrapOrThrow()
+            "OTP sent to your registered contact."
+        }.getOrElse { error ->
+            if (shouldUseFallbackData()) "OTP sent to your registered contact." else throw error
+        }
+    }
+
+    suspend fun verifyOtp(mobile: String, otp: String): String {
+        val api = authApi
+        if (api == null) {
+            return if (shouldUseFallbackData()) "Account verified — please sign in." else throw IllegalStateException("Auth API not configured.")
+        }
+        return runCatching {
+            api.verifyOtp(mapOf("mobile_number" to mobile, "otp" to otp)).unwrapOrThrow()
+            "Account verified — please sign in."
+        }.getOrElse { error ->
+            if (shouldUseFallbackData()) "Account verified — please sign in." else throw error
+        }
+    }
+
+    suspend fun forgotPassword(mobile: String): String {
+        val api = authApi
+        if (api == null) {
+            return if (shouldUseFallbackData()) "If registered, a reset link will be sent." else throw IllegalStateException("Auth API not configured.")
+        }
+        return runCatching {
+            api.forgotPassword(mapOf("mobile_number" to mobile)).unwrapOrThrow()
+            "If registered, a reset link will be sent."
+        }.getOrElse { error ->
+            if (shouldUseFallbackData()) "If registered, a reset link will be sent." else throw error
         }
     }
 

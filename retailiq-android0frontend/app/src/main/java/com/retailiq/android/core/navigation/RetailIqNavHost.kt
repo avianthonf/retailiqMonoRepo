@@ -39,6 +39,7 @@ import com.retailiq.android.feature.operations.ModuleDetailScreen
 import com.retailiq.android.feature.operations.OperationsHubScreen
 import com.retailiq.android.feature.operations.PosScreen
 import com.retailiq.android.feature.operations.ScannerScreen
+import com.retailiq.android.core.model.AuthMode
 import com.retailiq.android.feature.shell.RetailIqAppState
 import kotlinx.coroutines.launch
 
@@ -48,7 +49,7 @@ fun RetailIqNavHost(
     modifier: Modifier = Modifier,
     repository: RetailIqRepository,
     appState: RetailIqAppState,
-    onSignIn: (String, String) -> Unit,
+    onSubmitAuth: (AuthMode, Map<String, String>) -> Unit,
     onSignOut: () -> Unit,
 ) {
     if (!appState.isAuthenticated) {
@@ -57,7 +58,8 @@ fun RetailIqNavHost(
             repository = repository,
             isLoading = appState.isLoading,
             errorMessage = appState.authError,
-            onSignIn = onSignIn,
+            authMessage = appState.authMessage,
+            onSubmitAuth = onSubmitAuth,
         )
         return
     }

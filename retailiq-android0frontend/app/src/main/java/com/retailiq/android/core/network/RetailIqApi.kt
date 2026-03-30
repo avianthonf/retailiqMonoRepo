@@ -63,6 +63,15 @@ interface AuthApi {
 
     @POST("/api/v1/auth/refresh")
     suspend fun refresh(@Body body: AuthRefreshRequest): ApiEnvelope<AuthRefreshResponse>
+
+    @POST("/api/v1/auth/register")
+    suspend fun register(@Body body: Map<String, Any?>): ApiEnvelope<Map<String, Any?>>
+
+    @POST("/api/v1/auth/verify-otp")
+    suspend fun verifyOtp(@Body body: Map<String, Any?>): ApiEnvelope<Map<String, Any?>>
+
+    @POST("/api/v1/auth/forgot-password")
+    suspend fun forgotPassword(@Body body: Map<String, Any?>): ApiEnvelope<Map<String, Any?>>
 }
 
 interface DashboardApi {

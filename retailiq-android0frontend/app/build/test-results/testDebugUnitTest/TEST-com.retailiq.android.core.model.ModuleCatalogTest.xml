@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.retailiq.android.core.model.ModuleCatalogTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-03-30T04:00:17.750Z" hostname="WORKSTATION" time="0.005">
+<testsuite name="com.retailiq.android.core.model.ModuleCatalogTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-03-30T04:14:37.271Z" hostname="WORKSTATION" time="0.005">
   <properties/>
-  <testcase name="authPanelsCoverCoreEntryFlows" classname="com.retailiq.android.core.model.ModuleCatalogTest" time="0.002"/>
+  <testcase name="authPanelsCoverCoreEntryFlows" classname="com.retailiq.android.core.model.ModuleCatalogTest" time="0.001"/>
   <testcase name="longTailRoutesAreMarkedReady" classname="com.retailiq.android.core.model.ModuleCatalogTest" time="0.001"/>
   <testcase name="contractPrefixesMatchBackendHealthAndOpsRoutes" classname="com.retailiq.android.core.model.ModuleCatalogTest" time="0.001"/>
-  <testcase name="moduleLookupReturnsSpecializedRoutes" classname="com.retailiq.android.core.model.ModuleCatalogTest" time="0.001"/>
+  <testcase name="moduleLookupReturnsSpecializedRoutes" classname="com.retailiq.android.core.model.ModuleCatalogTest" time="0.0"/>
   <testcase name="moduleCatalogIncludesCoreBackendSections" classname="com.retailiq.android.core.model.ModuleCatalogTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

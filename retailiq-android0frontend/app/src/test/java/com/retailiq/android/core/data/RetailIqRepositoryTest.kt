@@ -50,6 +50,20 @@ class RetailIqRepositoryTest {
     }
 
     @Test
+    fun signInFallbackSessionIsPersistedAndHasExpectedShape() = runBlocking {
+        val repository = RetailIqRepository.create()
+
+        val session = repository.signIn("9876543210", "demo")
+
+        assertTrue(session.accessToken.isNotBlank())
+        assertTrue(session.refreshToken.isNotBlank())
+        assertTrue((session.userId ?: 0L) > 0L)
+        assertTrue((session.storeId ?: 0L) > 0L)
+        assertTrue(session.role?.isNotBlank() == true)
+        assertEquals(session, repository.currentSession())
+    }
+
+    @Test
     fun assistantAndScannerFallbacksStayAvailableWithoutBaseUrl() = runBlocking {
         val repository = RetailIqRepository.create()
 

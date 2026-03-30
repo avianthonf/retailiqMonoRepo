@@ -2,7 +2,6 @@ package com.retailiq.android.feature.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,19 +24,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.retailiq.android.core.data.RetailIqRepository
+import com.retailiq.android.core.model.AuthMode
 import com.retailiq.android.core.model.AuthPanel
-import com.retailiq.android.ui.components.InsightCard
-import kotlinx.coroutines.launch
 
 @Composable
 fun AuthScreen(
@@ -44,19 +40,25 @@ fun AuthScreen(
     repository: RetailIqRepository,
     isLoading: Boolean,
     errorMessage: String?,
-    onSignIn: (String, String) -> Unit,
+    authMessage: String?,
+    onSubmitAuth: (AuthMode, Map<String, String>) -> Unit,
 ) {
     var mobile by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var fullName by remember { mutableStateOf("") }
+    var storeName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var otp by remember { mutableStateOf("") }
+
     var panels by remember { mutableStateOf<List<AuthPanel>>(emptyList()) }
     var selectedIndex by remember { mutableIntStateOf(0) }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(repository) {
         panels = repository.authPanels()
     }
 
     val panel = panels.getOrNull(selectedIndex)
+    val mode = panel?.mode ?: AuthMode.SignIn
 
     LazyColumn(
         modifier = modifier
@@ -69,7 +71,7 @@ fun AuthScreen(
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("RetailIQ Android", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold)
                 Text(
-                    "A mobile-first frontend for RetailIQ operations. This build covers the core operator journeys and maps the wider backend into expandable Android modules.",
+                    "Mobile-first operator app for RetailIQ — sign in, register, or recover access below.",
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
@@ -81,7 +83,11 @@ fun AuthScreen(
                     panels.forEachIndexed { index, authPanel ->
                         Tab(
                             selected = index == selectedIndex,
-                            onClick = { selectedIndex = index },
+                            onClick = {
+                                selectedIndex = index
+                                mobile = ""; password = ""; fullName = ""
+                                storeName = ""; email = ""; otp = ""
+                            },
                             text = { Text(authPanel.mode.label) },
                         )
                     }
@@ -110,21 +116,76 @@ fun AuthScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     )
 
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Password / OTP") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    )
+                    when (mode) {
+                        AuthMode.SignIn -> {
+                            OutlinedTextField(
+                                value = password,
+                                onValueChange = { password = it },
+                                label = { Text("Password") },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                visualTransformation = PasswordVisualTransformation(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            )
+                        }
+                        AuthMode.Register -> {
+                            OutlinedTextField(
+                                value = fullName,
+                                onValueChange = { fullName = it },
+                                label = { Text("Full Name") },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                            )
+                            OutlinedTextField(
+                                value = password,
+                                onValueChange = { password = it },
+                                label = { Text("Password") },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                visualTransformation = PasswordVisualTransformation(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            )
+                            OutlinedTextField(
+                                value = storeName,
+                                onValueChange = { storeName = it },
+                                label = { Text("Store Name (optional)") },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                            )
+                            OutlinedTextField(
+                                value = email,
+                                onValueChange = { email = it },
+                                label = { Text("Email (optional)") },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                            )
+                        }
+                        AuthMode.VerifyOtp -> {
+                            OutlinedTextField(
+                                value = otp,
+                                onValueChange = { otp = it },
+                                label = { Text("OTP (6 digits)") },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                            )
+                        }
+                        AuthMode.ResetPassword -> {
+                        }
+                    }
 
                     Button(
                         onClick = {
-                            scope.launch {
-                                onSignIn(mobile, password)
+                            val fields = buildMap<String, String> {
+                                put("mobile", mobile)
+                                put("password", password)
+                                put("fullName", fullName)
+                                put("storeName", storeName)
+                                put("email", email)
+                                put("otp", otp)
                             }
+                            onSubmitAuth(mode, fields)
                         },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !isLoading,
@@ -137,6 +198,14 @@ fun AuthScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.secondary,
                     )
+
+                    if (!authMessage.isNullOrBlank()) {
+                        Text(
+                            text = authMessage,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
 
                     if (!errorMessage.isNullOrBlank()) {
                         Text(
@@ -151,30 +220,26 @@ fun AuthScreen(
 
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                InsightCard(
-                    title = "Security-first",
-                    body = "The app is structured for JWT refresh, role-aware routing, and secure token storage work next.",
-                    footnote = "Auth + session",
+                Card(
                     modifier = Modifier.weight(1f),
-                )
-                InsightCard(
-                    title = "Operator-friendly",
-                    body = "Every major backend area becomes a mobile module instead of a desktop-only afterthought.",
-                    footnote = "Navigation + modules",
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                ) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text("Security-first", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                        Text("JWT refresh, encrypted session storage, role-aware routing.", style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+                Card(
                     modifier = Modifier.weight(1f),
-                )
-            }
-        }
-
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterStart,
-            ) {
-                Text(
-                    "Signing in currently enters the verified app shell directly. The additional auth tabs are the completion path for registration, OTP, and password recovery screens.",
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                ) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text("Operator-friendly", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                        Text("Every backend module maps to a dedicated mobile surface.", style = MaterialTheme.typography.bodySmall)
+                    }
+                }
             }
         }
     }

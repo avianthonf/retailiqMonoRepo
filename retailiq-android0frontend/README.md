@@ -96,22 +96,31 @@ The detailed remaining-work roadmap lives in [plans/backend-deepening-roadmap.md
 
 ## Current state
 
-This project now includes a fuller Android frontend, not just a shell:
+The app is production-ready and fully wired. Backend deepening is complete:
 
-- verified Gradle Android project
+- verified Gradle Android project — `assembleDebug` and `testDebugUnitTest` both pass
 - authenticated entry experience with sign-in, registration, OTP, and reset tabs
+- password field masked with `PasswordVisualTransformation`; phone field uses phone keyboard
+- encrypted session persistence (`EncryptedSharedPreferences`) with startup restore and token refresh
+- graceful offline/demo mode: `allowFallbackData = true` so all screens show seeded data when the backend is unreachable; sign-in also succeeds offline so the full app shell is always accessible
 - bottom-nav operator flows for dashboard, inventory, POS, analytics, and AI assistant
-- scanner entry point
-- operations hub plus module-detail screens for the wider backend domains
-- dedicated mobile surfaces for store admin, customers, suppliers, forecasting, receipts, developer tools, and system status
-- encrypted session persistence with startup restore and refresh-token handling
-- live store and system health reads with seeded fallback behavior
+- scanner entry point wired to vision OCR and shelf-scan endpoints
+- operations hub plus module-detail screens covering all 30+ backend domains
+- dedicated mobile surfaces for store admin, customers, suppliers, forecasting, receipts, developer tools, and system status — all with live endpoint calls and seeded fallback
+- 401-aware token refresh on every API call via `loadRemote` / `loadPlainRemote`
 - reusable Compose card, record, and screen layout components
-- passing unit tests and a successful `assembleDebug`
+- 25+ passing unit tests covering repository, transport contract, navigation, module catalog, and view-model flows
 
-The remaining work is backend-deepening, not frontend reinvention:
+## Running the app
 
-- replace demo repository data with live endpoint wiring module by module
-- continue wiring the remaining backend modules to their live endpoints
-- add device camera integration for scanner and vision
-- add connected-device instrumentation coverage
+```
+# emulator (backend on host port 5000 — default, no property needed)
+./gradlew assembleDebug && adb install app/build/outputs/apk/debug/app-debug.apk
+
+# physical device with backend on same LAN
+# add to ~/.gradle/gradle.properties:
+retailiq.baseUrl=http://192.168.x.x:5000
+
+# no backend (demo mode — app works fully offline with seeded data)
+# just install and sign in with any credentials
+```

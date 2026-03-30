@@ -23,7 +23,7 @@ fun RetailIqApp(modifier: Modifier = Modifier) {
         modifier = modifier,
         repository = repository,
         appState = appState,
-        onSignIn = appViewModel::signIn,
+        onSubmitAuth = appViewModel::submitAuth,
         onSignOut = appViewModel::signOut,
     )
 }

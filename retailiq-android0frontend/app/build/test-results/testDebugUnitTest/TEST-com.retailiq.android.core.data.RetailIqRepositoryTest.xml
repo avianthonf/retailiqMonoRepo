@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.retailiq.android.core.data.RetailIqRepositoryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-03-30T04:00:17.594Z" hostname="WORKSTATION" time="0.153">
+<testsuite name="com.retailiq.android.core.data.RetailIqRepositoryTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-03-30T04:14:37.136Z" hostname="WORKSTATION" time="0.132">
   <properties/>
-  <testcase name="signInPersistsSessionInMemoryWithoutBaseUrl" classname="com.retailiq.android.core.data.RetailIqRepositoryTest" time="0.049"/>
-  <testcase name="seededBackendSurfacesStayAvailableWithoutBaseUrl" classname="com.retailiq.android.core.data.RetailIqRepositoryTest" time="0.075"/>
-  <testcase name="assistantAndScannerFallbacksStayAvailableWithoutBaseUrl" classname="com.retailiq.android.core.data.RetailIqRepositoryTest" time="0.028"/>
+  <testcase name="signInFallbackSessionIsPersistedAndHasExpectedShape" classname="com.retailiq.android.core.data.RetailIqRepositoryTest" time="0.044"/>
+  <testcase name="signInPersistsSessionInMemoryWithoutBaseUrl" classname="com.retailiq.android.core.data.RetailIqRepositoryTest" time="0.001"/>
+  <testcase name="seededBackendSurfacesStayAvailableWithoutBaseUrl" classname="com.retailiq.android.core.data.RetailIqRepositoryTest" time="0.063"/>
+  <testcase name="assistantAndScannerFallbacksStayAvailableWithoutBaseUrl" classname="com.retailiq.android.core.data.RetailIqRepositoryTest" time="0.022"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

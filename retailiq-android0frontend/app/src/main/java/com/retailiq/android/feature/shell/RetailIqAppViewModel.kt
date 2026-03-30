@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.retailiq.android.core.data.RetailIqRepository
+import com.retailiq.android.core.model.AuthMode
 import com.retailiq.android.core.model.Session
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ data class RetailIqAppState(
     val isLoading: Boolean = false,
     val session: Session? = null,
     val authError: String? = null,
+    val authMessage: String? = null,
 )
 
 class RetailIqAppViewModel(
@@ -42,7 +44,7 @@ class RetailIqAppViewModel(
     }
 
     fun signIn(mobileNumber: String, password: String) {
-        _uiState.value = _uiState.value.copy(isLoading = true, authError = null)
+        _uiState.value = _uiState.value.copy(isLoading = true, authError = null, authMessage = null)
 
         viewModelScope.launch(backgroundDispatcher) {
             runCatching { repository.signIn(mobileNumber = mobileNumber, password = password) }
@@ -59,6 +61,75 @@ class RetailIqAppViewModel(
                         authError = error.message ?: "Unable to sign in.",
                     )
                 }
+        }
+    }
+
+    fun submitAuth(mode: AuthMode, fields: Map<String, String>) {
+        when (mode) {
+            AuthMode.SignIn -> signIn(
+                mobileNumber = fields["mobile"] ?: "",
+                password = fields["password"] ?: "",
+            )
+            AuthMode.Register -> submitRegister(fields)
+            AuthMode.VerifyOtp -> submitVerifyOtp(fields)
+            AuthMode.ResetPassword -> submitForgotPassword(fields)
+        }
+    }
+
+    private fun submitRegister(fields: Map<String, String>) {
+        _uiState.value = _uiState.value.copy(isLoading = true, authError = null, authMessage = null)
+        viewModelScope.launch(backgroundDispatcher) {
+            runCatching {
+                repository.register(
+                    mobile = fields["mobile"] ?: "",
+                    password = fields["password"] ?: "",
+                    fullName = fields["fullName"] ?: "",
+                    storeName = fields["storeName"],
+                    email = fields["email"],
+                )
+            }.onSuccess { message ->
+                _uiState.value = _uiState.value.copy(isLoading = false, authMessage = message)
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    authError = error.message ?: "Registration failed.",
+                )
+            }
+        }
+    }
+
+    private fun submitVerifyOtp(fields: Map<String, String>) {
+        _uiState.value = _uiState.value.copy(isLoading = true, authError = null, authMessage = null)
+        viewModelScope.launch(backgroundDispatcher) {
+            runCatching {
+                repository.verifyOtp(
+                    mobile = fields["mobile"] ?: "",
+                    otp = fields["otp"] ?: "",
+                )
+            }.onSuccess { message ->
+                _uiState.value = _uiState.value.copy(isLoading = false, authMessage = message)
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    authError = error.message ?: "OTP verification failed.",
+                )
+            }
+        }
+    }
+
+    private fun submitForgotPassword(fields: Map<String, String>) {
+        _uiState.value = _uiState.value.copy(isLoading = true, authError = null, authMessage = null)
+        viewModelScope.launch(backgroundDispatcher) {
+            runCatching {
+                repository.forgotPassword(mobile = fields["mobile"] ?: "")
+            }.onSuccess { message ->
+                _uiState.value = _uiState.value.copy(isLoading = false, authMessage = message)
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    authError = error.message ?: "Password reset request failed.",
+                )
+            }
         }
     }
 
