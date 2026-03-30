@@ -64,11 +64,7 @@ fun DashboardScreen(
     repository: RetailIqRepository,
     session: Session?,
 ) {
-    var snapshot by remember { mutableStateOf<DashboardSnapshot?>(null) }
-
-    LaunchedEffect(repository) {
-        snapshot = repository.dashboard()
-    }
+    val state = rememberBackendResource(repository) { dashboard() }
 
     AppScreen(
         title = "Executive Dashboard",
@@ -80,10 +76,15 @@ fun DashboardScreen(
             color = MaterialTheme.colorScheme.secondary,
         )
 
-        if (snapshot == null) {
+        if (state.loading) {
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        } else if (state.error != null) {
+            Text(
+                text = state.error,
+                color = MaterialTheme.colorScheme.error,
+            )
         } else {
-            val ui = snapshot ?: return@AppScreen
+            val ui = state.data ?: return@AppScreen
 
             Text(ui.greeting, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
             Text(ui.storeName, style = MaterialTheme.typography.titleMedium)
@@ -131,53 +132,56 @@ fun DashboardScreen(
 
 @Composable
 fun InventoryScreen(repository: RetailIqRepository) {
-    var products by remember { mutableStateOf<List<ProductSummary>>(emptyList()) }
+    val state = rememberBackendResource(repository) { inventory() }
     var query by remember { mutableStateOf("") }
-
-    LaunchedEffect(repository) {
-        products = repository.inventory()
-    }
-
-    val filteredProducts = products.filter { product ->
-        query.isBlank() || product.name.contains(query, ignoreCase = true) || product.sku.contains(query, ignoreCase = true)
-    }
 
     AppScreen(
         title = "Inventory",
         subtitle = "Shelf-ready stock visibility, reorder cues, and fast product lookup.",
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(
-                value = query,
-                onValueChange = { query = it },
-                label = { Text("Search SKU or barcode") },
-                modifier = Modifier.weight(1f),
-                singleLine = true,
-            )
-            Button(onClick = {}) {
-                Text("New Product")
-            }
-        }
+        when {
+            state.loading -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            state.error != null -> Text(text = state.error, color = MaterialTheme.colorScheme.error)
+            else -> {
+                val products = state.data.orEmpty()
+                val filteredProducts = products.filter { product ->
+                    query.isBlank() || product.name.contains(query, ignoreCase = true) || product.sku.contains(query, ignoreCase = true)
+                }
 
-        filteredProducts.forEach { product ->
-            Card(
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            ) {
-                Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(product.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                            Text("${product.sku} • ${product.supplier}", style = MaterialTheme.typography.bodySmall)
-                        }
-                        PillLabel(text = product.priceLabel)
-                    }
-                    RecordRow("Current stock", "Available sellable units", product.stock.toString())
-                    RecordRow("Reorder level", "Minimum safe threshold", product.reorderLevel.toString())
-                    AssistChip(
-                        onClick = {},
-                        label = { Text(if (product.stock <= product.reorderLevel) "Reorder now" else "Healthy") },
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        label = { Text("Search SKU or barcode") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
                     )
+                    Button(onClick = {}) {
+                        Text("New Product")
+                    }
+                }
+
+                filteredProducts.forEach { product ->
+                    Card(
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    ) {
+                        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Text(product.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                                    Text("${product.sku} • ${product.supplier}", style = MaterialTheme.typography.bodySmall)
+                                }
+                                PillLabel(text = product.priceLabel)
+                            }
+                            RecordRow("Current stock", "Available sellable units", product.stock.toString())
+                            RecordRow("Reorder level", "Minimum safe threshold", product.reorderLevel.toString())
+                            AssistChip(
+                                onClick = {},
+                                label = { Text(if (product.stock <= product.reorderLevel) "Reorder now" else "Healthy") },
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -186,48 +190,46 @@ fun InventoryScreen(repository: RetailIqRepository) {
 
 @Composable
 fun PosScreen(repository: RetailIqRepository) {
-    var draft by remember { mutableStateOf<SalesDraft?>(null) }
-
-    LaunchedEffect(repository) {
-        draft = repository.salesDraft()
-    }
+    val state = rememberBackendResource(repository) { salesDraft() }
 
     AppScreen(
         title = "Point Of Sale",
         subtitle = "Counter workflow optimized for quick checkout, scanning, and assisted selling.",
     ) {
-        val currentDraft = draft
-        if (currentDraft == null) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-        } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                StatCard("Current basket", currentDraft.totalLabel, currentDraft.orderId, Modifier.weight(1f))
-                StatCard("Payment mode", currentDraft.paymentMode, "Ready to complete", Modifier.weight(1f))
-            }
+        when {
+            state.loading -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            state.error != null -> Text(text = state.error, color = MaterialTheme.colorScheme.error)
+            else -> {
+                val currentDraft = state.data ?: return@AppScreen
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                    StatCard("Current basket", currentDraft.totalLabel, currentDraft.orderId, Modifier.weight(1f))
+                    StatCard("Payment mode", currentDraft.paymentMode, "Ready to complete", Modifier.weight(1f))
+                }
 
-            currentDraft.lines.forEach { line ->
-                Card(shape = RoundedCornerShape(20.dp)) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Column {
-                            Text(line.productName, fontWeight = FontWeight.SemiBold)
-                            Text("${line.quantity} units")
+                currentDraft.lines.forEach { line ->
+                    Card(shape = RoundedCornerShape(20.dp)) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Column {
+                                Text(line.productName, fontWeight = FontWeight.SemiBold)
+                                Text("${line.quantity} units")
+                            }
+                            Text(line.priceLabel)
                         }
-                        Text(line.priceLabel)
                     }
                 }
-            }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = {}, modifier = Modifier.weight(1f)) {
-                    Text("Scan Item")
-                }
-                OutlinedButton(onClick = {}, modifier = Modifier.weight(1f)) {
-                    Text("Take Payment")
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(onClick = {}, modifier = Modifier.weight(1f)) {
+                        Text("Scan Item")
+                    }
+                    OutlinedButton(onClick = {}, modifier = Modifier.weight(1f)) {
+                        Text("Take Payment")
+                    }
                 }
             }
         }
@@ -236,42 +238,40 @@ fun PosScreen(repository: RetailIqRepository) {
 
 @Composable
 fun AnalyticsScreen(repository: RetailIqRepository) {
-    var analytics by remember { mutableStateOf<AnalyticsSummary?>(null) }
-
-    LaunchedEffect(repository) {
-        analytics = repository.analytics()
-    }
+    val state = rememberBackendResource(repository) { analytics() }
 
     AppScreen(
         title = "Analytics",
         subtitle = "Readable business intelligence for owners and floor managers.",
     ) {
-        val summary = analytics
-        if (summary == null) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-        } else {
-            Text(summary.headline, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        when {
+            state.loading -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            state.error != null -> Text(text = state.error, color = MaterialTheme.colorScheme.error)
+            else -> {
+                val summary = state.data ?: return@AppScreen
+                Text(summary.headline, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
 
-            summary.cards.chunked(2).forEach { row ->
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    row.forEach { card ->
-                        StatCard(card.label, card.value, card.trend, Modifier.weight(1f))
+                summary.cards.chunked(2).forEach { row ->
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        row.forEach { card ->
+                            StatCard(card.label, card.value, card.trend, Modifier.weight(1f))
+                        }
                     }
                 }
-            }
 
-            InsightCard(
-                title = "Highlights",
-                body = summary.highlights.joinToString(separator = "\n") { "• $it" },
-                footnote = "Positive movement",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            InsightCard(
-                title = "Watchouts",
-                body = summary.watchouts.joinToString(separator = "\n") { "• $it" },
-                footnote = "Requires operator review",
-                modifier = Modifier.fillMaxWidth(),
-            )
+                InsightCard(
+                    title = "Highlights",
+                    body = summary.highlights.joinToString(separator = "\n") { "• $it" },
+                    footnote = "Positive movement",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                InsightCard(
+                    title = "Watchouts",
+                    body = summary.watchouts.joinToString(separator = "\n") { "• $it" },
+                    footnote = "Requires operator review",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
     }
 }
@@ -497,39 +497,41 @@ fun OperationsHubScreen(
     repository: RetailIqRepository,
     onOpenModule: (String) -> Unit,
 ) {
-    var modules by remember { mutableStateOf<List<ModuleSpec>>(emptyList()) }
-
-    LaunchedEffect(repository) {
-        modules = repository.modules()
-    }
+    val state = rememberBackendResource(repository) { modules() }
 
     AppScreen(
         title = "Operations Hub",
         subtitle = "The rest of the backend surface area lives here as focused mobile modules.",
     ) {
-        modules.forEach { module ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onOpenModule(module.route) },
-                shape = RoundedCornerShape(24.dp),
-            ) {
-                Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(module.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                            Text(module.subtitle)
+        when {
+            state.loading -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            state.error != null -> Text(text = state.error, color = MaterialTheme.colorScheme.error)
+            else -> {
+                state.data.orEmpty().forEach { module ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onOpenModule(module.route) },
+                        shape = RoundedCornerShape(24.dp),
+                    ) {
+                        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Text(module.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                                    Text(module.subtitle)
+                                }
+                                PillLabel(
+                                    text = when (module.status) {
+                                        ModuleStatus.Ready -> "Ready"
+                                        ModuleStatus.Planned -> "Planned"
+                                    },
+                                )
+                            }
+                            Text(module.heroMetric, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                            Text(module.description)
+                            Text(module.backendPrefix, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
                         }
-                        PillLabel(
-                            text = when (module.status) {
-                                ModuleStatus.Ready -> "Ready"
-                                ModuleStatus.Planned -> "Planned"
-                            },
-                        )
                     }
-                    Text(module.heroMetric, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                    Text(module.description)
-                    Text(module.backendPrefix, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
                 }
             }
         }
@@ -542,6 +544,22 @@ fun ModuleDetailScreen(
     route: String,
 ) {
     when (route) {
+        "dashboard" -> {
+            DashboardScreen(repository, null)
+            return
+        }
+        "inventory" -> {
+            InventoryScreen(repository)
+            return
+        }
+        "transactions" -> {
+            PosScreen(repository)
+            return
+        }
+        "analytics" -> {
+            AnalyticsScreen(repository)
+            return
+        }
         "store" -> {
             StoreAdminScreen(repository)
             return

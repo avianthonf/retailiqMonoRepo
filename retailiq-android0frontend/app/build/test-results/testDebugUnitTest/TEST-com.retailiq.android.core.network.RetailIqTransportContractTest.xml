@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.retailiq.android.core.network.RetailIqTransportContractTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-03-30T04:00:17.794Z" hostname="WORKSTATION" time="0.006">
+  <properties/>
+  <testcase name="debugBlankBackendUrlFallsBackToEmulatorHost" classname="com.retailiq.android.core.network.RetailIqTransportContractTest" time="0.0"/>
+  <testcase name="systemHealthTargetsBackendRootHealthRoute" classname="com.retailiq.android.core.network.RetailIqTransportContractTest" time="0.001"/>
+  <testcase name="emulatorDetectionRecognizesCommonEmulatorFingerprints" classname="com.retailiq.android.core.network.RetailIqTransportContractTest" time="0.0"/>
+  <testcase name="debugNetworkSecurityConfigPermitsCleartextForConfiguredDevHosts" classname="com.retailiq.android.core.network.RetailIqTransportContractTest" time="0.001"/>
+  <testcase name="emulatorDetectionRejectsTypicalPhysicalDeviceFingerprints" classname="com.retailiq.android.core.network.RetailIqTransportContractTest" time="0.001"/>
+  <testcase name="debugBlankBackendUrlFallsBackToLoopbackOnPhysicalDevices" classname="com.retailiq.android.core.network.RetailIqTransportContractTest" time="0.0"/>
+  <testcase name="opsMaintenanceTargetsBackendMaintenanceRoute" classname="com.retailiq.android.core.network.RetailIqTransportContractTest" time="0.0"/>
+  <testcase name="releaseBlankBackendUrlFailsFast" classname="com.retailiq.android.core.network.RetailIqTransportContractTest" time="0.002"/>
+  <testcase name="androidSurfaceInventoryTracksBackendPrefixes" classname="com.retailiq.android.core.network.RetailIqTransportContractTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

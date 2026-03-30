@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.retailiq.android.core.data.RetailIqRepository
 import com.retailiq.android.core.model.Session
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,24 +21,30 @@ data class RetailIqAppState(
 
 class RetailIqAppViewModel(
     private val repository: RetailIqRepository,
+    private val backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(RetailIqAppState())
+    private val _uiState = MutableStateFlow(RetailIqAppState(isLoading = true))
     val uiState: StateFlow<RetailIqAppState> = _uiState.asStateFlow()
 
     init {
-        repository.currentSession()?.let { session ->
-            _uiState.value = RetailIqAppState(
-                isAuthenticated = true,
-                isLoading = false,
-                session = session,
-            )
+        viewModelScope.launch(backgroundDispatcher) {
+            val session = repository.currentSession()
+            _uiState.value = if (session != null) {
+                RetailIqAppState(
+                    isAuthenticated = true,
+                    isLoading = false,
+                    session = session,
+                )
+            } else {
+                RetailIqAppState()
+            }
         }
     }
 
     fun signIn(mobileNumber: String, password: String) {
         _uiState.value = _uiState.value.copy(isLoading = true, authError = null)
 
-        viewModelScope.launch {
+        viewModelScope.launch(backgroundDispatcher) {
             runCatching { repository.signIn(mobileNumber = mobileNumber, password = password) }
                 .onSuccess { session ->
                     _uiState.value = RetailIqAppState(
@@ -55,8 +63,10 @@ class RetailIqAppViewModel(
     }
 
     fun signOut() {
-        repository.signOut()
-        _uiState.value = RetailIqAppState()
+        viewModelScope.launch(backgroundDispatcher) {
+            repository.signOut()
+            _uiState.value = RetailIqAppState()
+        }
     }
 }
 

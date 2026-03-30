@@ -1,15 +1,15 @@
-#Sun Mar 29 15:46:44 IST 2026
-base.0=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
-base.1=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-base.10=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes3.dex
-base.2=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\10\\classes.dex
-base.3=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\14\\classes.dex
-base.4=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\15\\classes.dex
-base.5=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
-base.6=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\4\\classes.dex
-base.7=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\5\\classes.dex
-base.8=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\8\\classes.dex
-base.9=D\:\\Files\\Desktop\\Retailiq-Final-Integration\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
+#Mon Mar 30 09:30:59 IST 2026
+base.0=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.10=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes3.dex
+base.2=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\10\\classes.dex
+base.3=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\14\\classes.dex
+base.4=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\15\\classes.dex
+base.5=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
+base.6=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\4\\classes.dex
+base.7=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\5\\classes.dex
+base.8=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\8\\classes.dex
+base.9=D\:\\Projects\\retailiqMonoRepo\\retailiq-android0frontend\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.10=classes3.dex

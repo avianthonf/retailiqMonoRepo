@@ -4,94 +4,43 @@
             "outputFile": "com.retailiq.android.app-mergeDebugResources-41:/values/values.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\c246e2b5c3bd42c260ef3b2d3b7b0ac6\\transformed\\ui-graphics\\res\\values\\values.xml",
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\7d40546b4c377df66110e42452726b35\\transformed\\navigation-common-release\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2,15,21,27,30",
+                        "startColumns": "4,4,4,4,4",
+                        "startOffsets": "55,694,938,1185,1318",
+                        "endLines": "14,20,26,29,34",
+                        "endColumns": "24,24,24,24,24",
+                        "endOffsets": "689,933,1180,1313,1495"
+                    },
+                    "to": {
+                        "startLines": "475,488,494,500,509",
+                        "startColumns": "4,4,4,4,4",
+                        "startOffsets": "23735,24374,24618,24865,25228",
+                        "endLines": "487,493,499,502,513",
+                        "endColumns": "24,24,24,24,24",
+                        "endOffsets": "24369,24613,24860,24993,25405"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\d284515301bc17bc88e66fc52eff30dc\\transformed\\startup-runtime-1.1.1\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
                         "startOffsets": "55",
-                        "endColumns": "65",
-                        "endOffsets": "116"
+                        "endColumns": "82",
+                        "endOffsets": "133"
                     },
                     "to": {
-                        "startLines": "144",
+                        "startLines": "192",
                         "startColumns": "4",
-                        "startOffsets": "6789",
-                        "endColumns": "65",
-                        "endOffsets": "6850"
+                        "startOffsets": "9370",
+                        "endColumns": "82",
+                        "endOffsets": "9448"
                     }
                 },
                 {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\61f8e0e524539199d8ab5cf7b2e66f0d\\transformed\\core-viewtree-1.0.0\\res\\values\\values.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "42",
-                        "endOffsets": "93"
-                    },
-                    "to": {
-                        "startLines": "182",
-                        "startColumns": "4",
-                        "startOffsets": "8784",
-                        "endColumns": "42",
-                        "endOffsets": "8822"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\510de31bb41262599211f96fee52c46c\\transformed\\transition-1.6.0\\res\\values\\values.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,95,142,185,240,287,332,386,442,494,546,595,656",
-                        "endColumns": "39,46,42,54,46,44,53,55,51,51,48,60,49",
-                        "endOffsets": "90,137,180,235,282,327,381,437,489,541,590,651,701"
-                    },
-                    "to": {
-                        "startLines": "142,143,151,154,155,174,175,176,177,178,179,180,181",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "6702,6742,7138,7290,7345,8365,8410,8464,8520,8572,8624,8673,8734",
-                        "endColumns": "39,46,42,54,46,44,53,55,51,51,48,60,49",
-                        "endOffsets": "6737,6784,7176,7340,7387,8405,8459,8515,8567,8619,8668,8729,8779"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\2ec6a29322a1d84f1fc0f18081a8ca2d\\transformed\\navigation-runtime-release\\res\\values\\values.xml",
-                    "from": {
-                        "startLines": "2,3,10,13",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "55,108,412,527",
-                        "endLines": "2,9,12,15",
-                        "endColumns": "52,24,24,24",
-                        "endOffsets": "103,407,522,637"
-                    },
-                    "to": {
-                        "startLines": "150,333,503,506",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "7085,18740,24998,25113",
-                        "endLines": "150,339,505,508",
-                        "endColumns": "52,24,24,24",
-                        "endOffsets": "7133,19039,25108,25223"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\228ac35b95b1f4d1a2334c61843de6d1\\transformed\\activity-1.10.1\\res\\values\\values.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,97",
-                        "endColumns": "41,59",
-                        "endOffsets": "92,152"
-                    },
-                    "to": {
-                        "startLines": "153,184",
-                        "startColumns": "4,4",
-                        "startOffsets": "7248,8870",
-                        "endColumns": "41,59",
-                        "endOffsets": "7285,8925"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\b4e4cca6fcabd92b216e7c083b92de18\\transformed\\core-1.16.0\\res\\values\\values.xml",
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\b91d9634ffce3e2273e03ba3fc54119b\\transformed\\core-1.16.0\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,100,101,105,106,107,108,114,124,159,180,213",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -110,7 +59,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\cce471a231bbb1e26a3043e617be6026\\transformed\\ui\\res\\values\\values.xml",
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\37edff926386002e7e82bdbdfc33c245\\transformed\\ui\\res\\values\\values.xml",
                     "from": {
                         "startLines": "34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,64",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -129,7 +78,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\dd017baf0469c5424ab1db5e9038fa22\\transformed\\lifecycle-viewmodel\\res\\values\\values.xml",
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\08513651663eef78ebe7b76f05e4242f\\transformed\\lifecycle-viewmodel\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -146,24 +95,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\392dcc03faee4567d1c4bb153a5bbf91\\transformed\\material\\res\\values\\values.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "57",
-                        "endOffsets": "108"
-                    },
-                    "to": {
-                        "startLines": "277",
-                        "startColumns": "4",
-                        "startOffsets": "15562",
-                        "endColumns": "57",
-                        "endOffsets": "15615"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\6788d140da6ebe8ac2d8e9aac1688f64\\transformed\\material3\\res\\values\\values.xml",
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\a470f4403d41858b5c6c354945b84178\\transformed\\material3\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,15,16,17,18,19,20,21,22,23,24,25,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,84",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -182,75 +114,58 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\894bf0d5a321d11665b6bd9aff036347\\transformed\\foundation\\res\\values\\values.xml",
-                    "from": {
-                        "startLines": "2,3,4,5",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "55,111,185,241",
-                        "endColumns": "55,73,55,54",
-                        "endOffsets": "106,180,236,291"
-                    },
-                    "to": {
-                        "startLines": "139,190,291,292",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "6533,9230,16312,16368",
-                        "endColumns": "55,73,55,54",
-                        "endOffsets": "6584,9299,16363,16418"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\b0559edea173a5778c713558e49b6553\\transformed\\customview-poolingcontainer-1.0.0\\res\\values\\values.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,109",
-                        "endColumns": "53,66",
-                        "endOffsets": "104,171"
-                    },
-                    "to": {
-                        "startLines": "147,152",
-                        "startColumns": "4,4",
-                        "startOffsets": "6961,7181",
-                        "endColumns": "53,66",
-                        "endOffsets": "7010,7243"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\6e36a54d067248322b5c9545c7716750\\transformed\\savedstate\\res\\values\\values.xml",
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\2a1621be2aded5e7ff1f3705cf7c4cfe\\transformed\\material\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
                         "startOffsets": "55",
-                        "endColumns": "53",
-                        "endOffsets": "104"
+                        "endColumns": "57",
+                        "endOffsets": "108"
                     },
                     "to": {
-                        "startLines": "185",
+                        "startLines": "277",
                         "startColumns": "4",
-                        "startOffsets": "8930",
-                        "endColumns": "53",
-                        "endOffsets": "8979"
+                        "startOffsets": "15562",
+                        "endColumns": "57",
+                        "endOffsets": "15615"
                     }
                 },
                 {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\70ab2e1b2c32b9cd91e46cabe8fb725b\\transformed\\startup-runtime-1.1.1\\res\\values\\values.xml",
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\9b9cc2f8f690fbb8e01a5804de92b4e3\\transformed\\ui-graphics\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
                         "startOffsets": "55",
-                        "endColumns": "82",
-                        "endOffsets": "133"
+                        "endColumns": "65",
+                        "endOffsets": "116"
                     },
                     "to": {
-                        "startLines": "192",
+                        "startLines": "144",
                         "startColumns": "4",
-                        "startOffsets": "9370",
-                        "endColumns": "82",
-                        "endOffsets": "9448"
+                        "startOffsets": "6789",
+                        "endColumns": "65",
+                        "endOffsets": "6850"
                     }
                 },
                 {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\0c1526eafa19f756d9e5624c8865bb3d\\transformed\\window-1.5.0\\res\\values\\values.xml",
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\cba878734f18a11b2ae7d9e020f5be37\\transformed\\core-viewtree-1.0.0\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "42",
+                        "endOffsets": "93"
+                    },
+                    "to": {
+                        "startLines": "182",
+                        "startColumns": "4",
+                        "startOffsets": "8784",
+                        "endColumns": "42",
+                        "endOffsets": "8822"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\c864f438a0315b743b462a5dbb80451d\\transformed\\window-1.5.0\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2,3,9,17,25,31,37,49,55,61,62,63,64,70,71,72,73,79,84,103,111,129",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -269,7 +184,94 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\9ea207582caf89e4cfca413d7fd3a0aa\\transformed\\lifecycle-runtime\\res\\values\\values.xml",
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\3ac60d26d49aed9b9bf960e40dd7f8de\\transformed\\savedstate\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "53",
+                        "endOffsets": "104"
+                    },
+                    "to": {
+                        "startLines": "185",
+                        "startColumns": "4",
+                        "startOffsets": "8930",
+                        "endColumns": "53",
+                        "endOffsets": "8979"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\f892551df49ee590c713acb4df7ef794\\transformed\\transition-1.6.0\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,95,142,185,240,287,332,386,442,494,546,595,656",
+                        "endColumns": "39,46,42,54,46,44,53,55,51,51,48,60,49",
+                        "endOffsets": "90,137,180,235,282,327,381,437,489,541,590,651,701"
+                    },
+                    "to": {
+                        "startLines": "142,143,151,154,155,174,175,176,177,178,179,180,181",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "6702,6742,7138,7290,7345,8365,8410,8464,8520,8572,8624,8673,8734",
+                        "endColumns": "39,46,42,54,46,44,53,55,51,51,48,60,49",
+                        "endOffsets": "6737,6784,7176,7340,7387,8405,8459,8515,8567,8619,8668,8729,8779"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\70a4fe5e473b460dbd0377afa8a5070a\\transformed\\activity-1.10.1\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,97",
+                        "endColumns": "41,59",
+                        "endOffsets": "92,152"
+                    },
+                    "to": {
+                        "startLines": "153,184",
+                        "startColumns": "4,4",
+                        "startOffsets": "7248,8870",
+                        "endColumns": "41,59",
+                        "endOffsets": "7285,8925"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\5c53cd1b9bd2e6ad90c08237fe4b36db\\transformed\\customview-poolingcontainer-1.0.0\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,109",
+                        "endColumns": "53,66",
+                        "endOffsets": "104,171"
+                    },
+                    "to": {
+                        "startLines": "147,152",
+                        "startColumns": "4,4",
+                        "startOffsets": "6961,7181",
+                        "endColumns": "53,66",
+                        "endOffsets": "7010,7243"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\db6648d8c6e68090cef5be6c1669ea48\\transformed\\navigation-runtime-release\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2,3,10,13",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,108,412,527",
+                        "endLines": "2,9,12,15",
+                        "endColumns": "52,24,24,24",
+                        "endOffsets": "103,407,522,637"
+                    },
+                    "to": {
+                        "startLines": "150,333,503,506",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "7085,18740,24998,25113",
+                        "endLines": "150,339,505,508",
+                        "endColumns": "52,24,24,24",
+                        "endOffsets": "7133,19039,25108,25223"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\28081f3d6ec199c0ca9024b01b4bc3d4\\transformed\\lifecycle-runtime\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -286,22 +288,20 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\avian\\.gradle\\caches\\8.13\\transforms\\a1e8e8882ceeb94b7cb44a22a09b3e18\\transformed\\navigation-common-release\\res\\values\\values.xml",
+                    "source": "C:\\Users\\Avinash\\.gradle\\caches\\9.0.0\\transforms\\053e8998027b3613df7c00baf1bb83a7\\transformed\\foundation\\res\\values\\values.xml",
                     "from": {
-                        "startLines": "2,15,21,27,30",
-                        "startColumns": "4,4,4,4,4",
-                        "startOffsets": "55,694,938,1185,1318",
-                        "endLines": "14,20,26,29,34",
-                        "endColumns": "24,24,24,24,24",
-                        "endOffsets": "689,933,1180,1313,1495"
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,111,185,241",
+                        "endColumns": "55,73,55,54",
+                        "endOffsets": "106,180,236,291"
                     },
                     "to": {
-                        "startLines": "475,488,494,500,509",
-                        "startColumns": "4,4,4,4,4",
-                        "startOffsets": "23735,24374,24618,24865,25228",
-                        "endLines": "487,493,499,502,513",
-                        "endColumns": "24,24,24,24,24",
-                        "endOffsets": "24369,24613,24860,24993,25405"
+                        "startLines": "139,190,291,292",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "6533,9230,16312,16368",
+                        "endColumns": "55,73,55,54",
+                        "endOffsets": "6584,9299,16363,16418"
                     }
                 }
             ]

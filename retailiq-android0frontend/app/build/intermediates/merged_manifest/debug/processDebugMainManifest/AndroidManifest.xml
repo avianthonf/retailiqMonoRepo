@@ -22,8 +22,10 @@
         android:debuggable="true"
         android:extractNativeLibs="false"
         android:label="RetailIQ"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar" >
+        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:usesCleartextTraffic="true" >
         <activity
             android:name="com.retailiq.android.MainActivity"
             android:exported="true" >

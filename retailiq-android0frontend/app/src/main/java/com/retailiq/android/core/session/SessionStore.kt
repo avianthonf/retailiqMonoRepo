@@ -28,7 +28,7 @@ class InMemorySessionStore : SessionStore {
 class EncryptedPreferencesSessionStore(
     context: Context,
 ) : SessionStore {
-    private val preferences = run {
+    private val preferences by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 
         EncryptedSharedPreferences.create(

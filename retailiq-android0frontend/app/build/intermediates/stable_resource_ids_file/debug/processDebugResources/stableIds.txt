@@ -306,6 +306,7 @@ com.retailiq.android:id/draggable = 0x7f050035
 com.retailiq.android:attr/popUpToInclusive = 0x7f01002d
 com.retailiq.android:id/compose_view_saveable_id_tag = 0x7f050032
 com.retailiq.android:dimen/notification_action_icon_size = 0x7f030007
+com.retailiq.android:xml/network_security_config = 0x7f0b0000
 com.retailiq.android:string/androidx_startup = 0x7f080002
 com.retailiq.android:attr/fontProviderCerts = 0x7f010017
 com.retailiq.android:dimen/compat_button_inset_horizontal_material = 0x7f030000

@@ -1,6 +1,7 @@
 package com.retailiq.android.core.data
 
 import android.content.Context
+import android.os.Build as AndroidBuild
 import com.retailiq.android.BuildConfig
 import com.retailiq.android.core.model.AnalyticsSummary
 import com.retailiq.android.core.model.ApiEnvelope
@@ -76,7 +77,6 @@ import com.retailiq.android.core.model.SystemStatusSnapshot
 import com.retailiq.android.core.model.StoreCategoryDto
 import com.retailiq.android.core.model.StoreProfileDto
 import com.retailiq.android.core.model.StoreTaxConfigDto
-import com.retailiq.android.core.model.SystemHealthDto
 import com.retailiq.android.core.model.TeamPingDto
 import com.retailiq.android.core.model.NlpQueryDto
 import com.retailiq.android.core.model.NlpRecommendationsDto
@@ -118,6 +118,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 class RetailIqRepository private constructor(
     private val sessionStore: SessionStore,
+    private val allowFallbackData: Boolean,
     private val authApi: AuthApi?,
     private val dashboardApi: DashboardApi?,
     private val storeApi: StoreApi?,
@@ -153,20 +154,36 @@ class RetailIqRepository private constructor(
             )
         }
 
-        return authApi
-            .login(AuthRequest(mobileNumber = mobileNumber, password = password))
-            .unwrapOrThrow()
-            .let { response ->
+        return runCatching {
+            authApi
+                .login(AuthRequest(mobileNumber = mobileNumber, password = password))
+                .unwrapOrThrow()
+                .let { response ->
+                    persistSession(
+                        Session(
+                            accessToken = response.accessToken,
+                            refreshToken = response.refreshToken,
+                            userId = response.userId,
+                            storeId = response.storeId,
+                            role = response.role,
+                        ),
+                    )
+                }
+        }.getOrElse { error ->
+            if (shouldUseFallbackData()) {
                 persistSession(
                     Session(
-                        accessToken = response.accessToken,
-                        refreshToken = response.refreshToken,
-                        userId = response.userId,
-                        storeId = response.storeId,
-                        role = response.role,
+                        accessToken = "demo-access",
+                        refreshToken = "demo-refresh",
+                        userId = 1L,
+                        storeId = 101L,
+                        role = "owner",
                     ),
                 )
+            } else {
+                throw error
             }
+        }
     }
 
     suspend fun refreshSession(): Session? {
@@ -308,6 +325,8 @@ class RetailIqRepository private constructor(
         return java.time.YearMonth.now().toString()
     }
 
+    private fun shouldUseFallbackData(): Boolean = allowFallbackData
+
     suspend fun dashboard(): DashboardSnapshot {
         val api = dashboardApi
         if (api != null) {
@@ -426,21 +445,19 @@ class RetailIqRepository private constructor(
     }
 
     suspend fun inventory(): List<ProductSummary> {
-        val api = inventoryApi
-        if (api != null) {
-            val liveProducts = runCatching {
-                api.products(page = 1, pageSize = 24, lowStock = false, slowMoving = false).unwrapOrThrow()
-            }.getOrElse {
-                listOf(
-                    DashboardInventoryProductDto(1001, "Basmati Rice 5kg", "RICE-5KG", null, 18.0, 12.0, 420.0, "Agri Source", "pcs", true),
-                    DashboardInventoryProductDto(1002, "Cold Brew Bottle", "BEV-CB-01", null, 9.0, 15.0, 145.0, "Urban Beverages", "pcs", true),
-                    DashboardInventoryProductDto(1003, "Detergent Pack", "HOME-DG-3", null, 27.0, 10.0, 210.0, "Bright Clean", "pcs", true),
-                    DashboardInventoryProductDto(1004, "Protein Snack Bar", "SNK-PRO-7", null, 6.0, 8.0, 65.0, "Fit Foods", "pcs", true),
-                    DashboardInventoryProductDto(1005, "Masala Noodles Box", "SNK-MSL-3", null, 34.0, 20.0, 30.0, "Quick Foods", "pcs", true),
-                    DashboardInventoryProductDto(1006, "Kids Fruit Drink", "BEV-KID-4", null, 11.0, 18.0, 25.0, "Urban Beverages", "pcs", true),
-                )
-            }
+        val liveProducts = loadRemote(
+            remote = { inventoryApi?.products(page = 1, pageSize = 24, lowStock = false, slowMoving = false) },
+            fallback = listOf(
+                DashboardInventoryProductDto(1001, "Basmati Rice 5kg", "RICE-5KG", null, 18.0, 12.0, 420.0, "Agri Source", "pcs", true),
+                DashboardInventoryProductDto(1002, "Cold Brew Bottle", "BEV-CB-01", null, 9.0, 15.0, 145.0, "Urban Beverages", "pcs", true),
+                DashboardInventoryProductDto(1003, "Detergent Pack", "HOME-DG-3", null, 27.0, 10.0, 210.0, "Bright Clean", "pcs", true),
+                DashboardInventoryProductDto(1004, "Protein Snack Bar", "SNK-PRO-7", null, 6.0, 8.0, 65.0, "Fit Foods", "pcs", true),
+                DashboardInventoryProductDto(1005, "Masala Noodles Box", "SNK-MSL-3", null, 34.0, 20.0, 30.0, "Quick Foods", "pcs", true),
+                DashboardInventoryProductDto(1006, "Kids Fruit Drink", "BEV-KID-4", null, 11.0, 18.0, 25.0, "Urban Beverages", "pcs", true),
+            ),
+        )
 
+        if (inventoryApi != null) {
             return liveProducts.map { product ->
                 ProductSummary(
                     id = product.productId,
@@ -503,6 +520,101 @@ class RetailIqRepository private constructor(
         )
 
         return loadRemote(remote = { analyticsApi?.summary() }, fallback = local)
+    }
+
+    suspend fun dashboardModule(): ModuleSpec {
+        val snapshot = dashboard()
+        return moduleSpec(
+            route = "dashboard",
+            title = "Dashboard",
+            subtitle = "Executive overview and live risk.",
+            backendPrefix = "/api/v1/dashboard/overview",
+            heroMetric = snapshot.storeName,
+            description = snapshot.greeting,
+            records = snapshot.kpis.map { kpi ->
+                ModuleRecord(
+                    title = kpi.label,
+                    supportingText = "Live dashboard KPI",
+                    value = "${kpi.value} (${kpi.trend})",
+                )
+            },
+            actions = snapshot.quickActions.map {
+                ModuleAction(it.title, it.description)
+            },
+            category = ModuleCategory.Platform,
+        )
+    }
+
+    suspend fun inventoryModule(): ModuleSpec {
+        val products = inventory()
+        return moduleSpec(
+            route = "inventory",
+            title = "Inventory",
+            subtitle = "Stock visibility and reorder cues.",
+            backendPrefix = "/api/v1/inventory",
+            heroMetric = "${products.size} live products",
+            description = "Operate the inventory family directly from the backend route tree.",
+            records = products.take(3).map { product ->
+                ModuleRecord(
+                    title = product.name,
+                    supportingText = product.sku,
+                    value = "${product.stock} / ${product.reorderLevel}",
+                )
+            },
+            actions = listOf(
+                ModuleAction("Open stock list", "Browse backend inventory records."),
+                ModuleAction("Run audit", "Review stock discrepancies and alerts."),
+            ),
+            category = ModuleCategory.Operations,
+        )
+    }
+
+    suspend fun transactionsModule(): ModuleSpec {
+        val draft = salesDraft()
+        return moduleSpec(
+            route = "transactions",
+            title = "Transactions",
+            subtitle = "POS draft and recent transaction history.",
+            backendPrefix = "/api/v1/transactions/summary/daily",
+            heroMetric = draft.totalLabel,
+            description = "Link the counter flow to the backend transactions family.",
+            records = draft.lines.map { line ->
+                ModuleRecord(
+                    title = line.productName,
+                    supportingText = "${line.quantity} units",
+                    value = line.priceLabel,
+                )
+            },
+            actions = listOf(
+                ModuleAction("Open daily draft", "Review the latest sale draft from the backend."),
+                ModuleAction("Review history", "Inspect recent transaction activity."),
+            ),
+            category = ModuleCategory.Commerce,
+        )
+    }
+
+    suspend fun analyticsModule(): ModuleSpec {
+        val summary = analytics()
+        return moduleSpec(
+            route = "analytics",
+            title = "Analytics",
+            subtitle = "Revenue and profit analytics.",
+            backendPrefix = "/api/v1/analytics/dashboard",
+            heroMetric = summary.headline,
+            description = "Expose the backend analytics dashboard as a dedicated mobile surface.",
+            records = summary.cards.take(4).map { card ->
+                ModuleRecord(
+                    title = card.label,
+                    supportingText = "Analytics KPI",
+                    value = "${card.value} (${card.trend})",
+                )
+            },
+            actions = listOf(
+                ModuleAction("Open dashboard", "Review revenue, profit, and breakdowns."),
+                ModuleAction("Check watchouts", "Inspect the live analytics risks."),
+            ),
+            category = ModuleCategory.Platform,
+        )
     }
 
     suspend fun storeSnapshot(): StoreAdminSnapshot {
@@ -708,56 +820,52 @@ class RetailIqRepository private constructor(
                 ),
             ),
         )
-        val liveInventory = runCatching {
-            inventoryApi?.products()?.unwrapOrThrow()?.map { product ->
-                ProductSummary(
-                    id = product.productId,
-                    name = product.name,
-                    sku = product.skuCode,
-                    stock = product.currentStock.toInt(),
-                    reorderLevel = product.reorderLevel.toInt(),
-                    priceLabel = "Rs ${product.sellingPrice.toInt()}",
-                    supplier = product.supplierName ?: "Unknown supplier",
-                )
-            }.orEmpty()
-        }.getOrElse {
-            listOf(ProductSummary(1001, "Cold Brew Bottle", "BEV-CB-01", 15, 12, "Rs 145", "Urban Beverages"))
+        val liveInventory = loadRemote(
+            remote = { inventoryApi?.products() },
+            fallback = listOf(
+                DashboardInventoryProductDto(1001, "Cold Brew Bottle", "BEV-CB-01", null, 15.0, 12.0, 145.0, "Urban Beverages", "pcs", true),
+            ),
+        ).map { product ->
+            ProductSummary(
+                id = product.productId,
+                name = product.name,
+                sku = product.skuCode,
+                stock = product.currentStock.toInt(),
+                reorderLevel = product.reorderLevel.toInt(),
+                priceLabel = "Rs ${product.sellingPrice.toInt()}",
+                supplier = product.supplierName ?: "Unknown supplier",
+            )
         }
         val selectedProduct = liveInventory.firstOrNull()
-        val storeResponse = try {
-            forecastingApi?.storeForecast(7)
-        } catch (_: Exception) {
-            null
-        } ?: fallbackStoreForecast
+        val storeResponse = loadPlainRemote(remote  = { forecastingApi?.storeForecast(7) }, fallback = fallbackStoreForecast)
         val skuResponse = selectedProduct?.let { product ->
-            try {
-                forecastingApi?.skuForecast(product.id, 7)
-            } catch (_: Exception) {
-                null
-            } ?: ApiEnvelope(
-                success = true,
-                data = listOf(
-                    ForecastPointDto("2026-03-30", 12.5, 8.0, 17.0),
-                    ForecastPointDto("2026-03-31", 13.0, 8.4, 17.8),
-                    ForecastPointDto("2026-04-01", 13.7, 9.1, 18.4),
-                    ForecastPointDto("2026-04-02", 14.3, 9.7, 19.1),
-                ),
-                error = null,
-                meta = mapOf(
-                    "product_id" to product.id,
-                    "product_name" to product.name,
-                    "regime" to "stable",
-                    "model_type" to "prophet",
-                    "confidence_tier" to "prophet",
-                    "training_window_days" to 90,
-                    "generated_at" to "2026-03-29T00:00:00",
-                    "reorder_suggestion" to mapOf(
-                        "should_reorder" to true,
-                        "current_stock" to product.stock.toDouble(),
-                        "forecasted_demand" to 87.5,
-                        "lead_time_days" to 3,
-                        "lead_time_demand" to 37.5,
-                        "suggested_order_qty" to 42.5,
+            loadPlainRemote(
+                remote = { forecastingApi?.skuForecast(product.id, 7) },
+                fallback = ApiEnvelope(
+                    success = true,
+                    data = listOf(
+                        ForecastPointDto("2026-03-30", 12.5, 8.0, 17.0),
+                        ForecastPointDto("2026-03-31", 13.0, 8.4, 17.8),
+                        ForecastPointDto("2026-04-01", 13.7, 9.1, 18.4),
+                        ForecastPointDto("2026-04-02", 14.3, 9.7, 19.1),
+                    ),
+                    error = null,
+                    meta = mapOf(
+                        "product_id" to product.id,
+                        "product_name" to product.name,
+                        "regime" to "stable",
+                        "model_type" to "prophet",
+                        "confidence_tier" to "prophet",
+                        "training_window_days" to 90,
+                        "generated_at" to "2026-03-29T00:00:00",
+                        "reorder_suggestion" to mapOf(
+                            "should_reorder" to true,
+                            "current_stock" to product.stock.toDouble(),
+                            "forecasted_demand" to 87.5,
+                            "lead_time_days" to 3,
+                            "lead_time_demand" to 37.5,
+                            "suggested_order_qty" to 42.5,
+                        ),
                     ),
                 ),
             )
@@ -900,16 +1008,21 @@ class RetailIqRepository private constructor(
         )
 
         val api = receiptsApi ?: return fallback
-        val created = runCatching {
-            api.print(
-                mapOf(
-                    "transaction_id" to transactionId,
-                    "printer_mac_address" to printerMacAddress,
-                ),
-            )
-        }.getOrNull() ?: return fallback
+        val created = loadRemote(
+            remote = {
+                api.print(
+                    mapOf(
+                        "transaction_id" to transactionId,
+                        "printer_mac_address" to printerMacAddress,
+                    ),
+                )
+            },
+            fallback = mapOf(
+                "job_id" to 1001,
+            ),
+        )
 
-        val jobId = (created.data?.get("job_id") as? Number)?.toLong() ?: return fallback
+        val jobId = (created["job_id"] as? Number)?.toLong() ?: return fallback
         val job = loadRemote(
             remote = { api.printJob(jobId) },
             fallback = PrintJobDto(
@@ -1024,27 +1137,69 @@ class RetailIqRepository private constructor(
     }
 
     suspend fun systemStatus(): SystemStatusSnapshot {
-        val fallbackHealth = SystemHealthDto(
-            status = "ok",
-            db = "ok",
-            redis = "ok",
+        val fallbackHealth = mapOf(
+            "status" to "ok",
+            "version" to "1.0.0",
         )
         val fallbackPing = TeamPingDto(success = true)
 
-        val health = runCatching { systemApi?.health() }.getOrNull() ?: fallbackHealth
-        val ping = runCatching { systemApi?.teamPing() }.getOrNull() ?: fallbackPing
+        val health = loadPlainRemote(remote = { systemApi?.health() }, fallback = fallbackHealth)
+        val ping = loadPlainRemote(remote = { systemApi?.teamPing() }, fallback = fallbackPing)
+        val backendVersion = stringValue(health, "version", "unknown")
 
         return SystemStatusSnapshot(
             health = listOf(
-                HealthSignal("API", health.status, "Application endpoints are reachable."),
-                HealthSignal("Database", health.db, "Primary data store is healthy."),
-                HealthSignal("Redis", health.redis, "Cache and queue infrastructure are healthy."),
+                HealthSignal(
+                    "API",
+                    stringValue(health, "status", "unknown"),
+                    "Backend version $backendVersion reported by /health.",
+                ),
+                HealthSignal(
+                    "Team Ping",
+                    if (ping.success) "success" else "degraded",
+                    "Backend ping returned ${ping.success}.",
+                ),
             ),
             teamPing = if (ping.success) "success" else "degraded",
             notes = listOf(
-                "System checks are no-auth and safe to show on a public onboarding device.",
-                "A team ping success indicates the shell can reach core services.",
+                "Health checks are served from /health.",
+                "Backend version: $backendVersion.",
             ),
+        )
+    }
+
+    suspend fun opsModule(): ModuleSpec {
+        val maintenance = loadPlainRemote(
+            remote = { operationsApi?.maintenance() },
+            fallback = mapOf(
+                "scheduled_maintenance" to emptyList<Map<String, Any?>>(),
+                "ongoing_incidents" to emptyList<Map<String, Any?>>(),
+                "system_status" to "healthy",
+                "checked_at" to null,
+            ),
+        )
+        val scheduledMaintenance = asStringMapList(maintenance["scheduled_maintenance"])
+        val incidents = asStringMapList(maintenance["ongoing_incidents"])
+        val systemStatus = stringValue(maintenance, "system_status", "healthy")
+        val checkedAt = stringValue(maintenance, "checked_at", "unknown")
+
+        return moduleSpec(
+            route = "ops",
+            title = "Operations",
+            subtitle = "Maintenance windows and incident watch.",
+            backendPrefix = "/api/v1/ops",
+            heroMetric = systemStatus.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
+            description = "Surface scheduled maintenance, live incidents, and the latest backend status check.",
+            records = listOf(
+                ModuleRecord("Maintenance windows", "Scheduled backend maintenance entries", scheduledMaintenance.size.toString()),
+                ModuleRecord("Ongoing incidents", "Active incident records", incidents.size.toString()),
+                ModuleRecord("Checked at", "Last backend maintenance check", checkedAt),
+            ),
+            actions = listOf(
+                ModuleAction("Review maintenance", "Inspect planned downtime and service notes."),
+                ModuleAction("Open incidents", "Check whether any active incident needs attention."),
+            ),
+            category = ModuleCategory.Operations,
         )
     }
 
@@ -1153,6 +1308,231 @@ class RetailIqRepository private constructor(
         return VisionReceiptDto(
             rawText = receiptMap["raw_text"] as? String ?: "Receipt digitization unavailable right now.",
             items = typedItems,
+        )
+    }
+
+    suspend fun barcodesModule(): ModuleSpec {
+        val liveProducts = loadRemote(
+            remote = { inventoryApi?.products(page = 1, pageSize = 5, lowStock = false, slowMoving = false) },
+            fallback = listOf(
+                DashboardInventoryProductDto(1001, "Cold Brew Bottle", "BEV-CB-01", null, 15.0, 12.0, 145.0, "Urban Beverages", "pcs", true),
+            ),
+        )
+        val selectedProduct = liveProducts.firstOrNull()
+        val barcodeList = selectedProduct?.let { product ->
+            loadRemote(remote = { longTailApi?.barcodeList(product.productId) }, fallback = emptyList<Map<String, Any?>>())
+        } ?: emptyList()
+        val lookup = barcodeList.firstOrNull()?.let { barcode ->
+            barcode["barcode_value"]?.toString()?.let { value ->
+                loadRemote(remote = { longTailApi?.barcodeLookup(value) }, fallback = emptyMap<String, Any?>())
+            }
+        } ?: emptyMap()
+
+        return moduleSpec(
+            route = "barcodes",
+            title = "Barcodes",
+            subtitle = "Barcode lookup and product tag registry.",
+            backendPrefix = "/api/v1/barcodes",
+            heroMetric = "${barcodeList.size} registered tags",
+            description = "Resolve scan values and inspect current barcode registrations against live backend inventory data.",
+            records = buildList {
+                selectedProduct?.let { product ->
+                    add(ModuleRecord("Sample product", "First live inventory product", product.name))
+                }
+                addAll(recordsFromList("Barcode", barcodeList, valueKey = "barcode_value"))
+                if (lookup.isNotEmpty()) {
+                    add(ModuleRecord("Lookup price", "Resolved scan price", stringValue(lookup, "price", "0")))
+                }
+            },
+            actions = listOf(
+                ModuleAction("Lookup barcode", "Resolve a code to live product details."),
+                ModuleAction("Open registry", "Inspect registered barcodes for a product."),
+            ),
+            category = ModuleCategory.Operations,
+        )
+    }
+
+    suspend fun i18nModule(): ModuleSpec {
+        val translations = loadRemote(
+            remote = { longTailApi?.translations(locale = "en", module = "dashboard") },
+            fallback = mapOf("locale" to "en", "catalog" to emptyMap<String, Any?>()),
+        )
+        val catalog = asStringMap(translations["catalog"])
+        val currencies = loadRemote(remote = { longTailApi?.currencies() }, fallback = emptyList<Map<String, Any?>>())
+        val countries = loadRemote(remote = { longTailApi?.countries() }, fallback = emptyList<Map<String, Any?>>())
+
+        return moduleSpec(
+            route = "i18n",
+            title = "I18N",
+            subtitle = "Translations, currencies, and country defaults.",
+            backendPrefix = "/api/v1/i18n",
+            heroMetric = "${catalog.size} translation keys",
+            description = "Inspect localization payloads, supported currencies, and country defaults from the backend.",
+            records = buildList {
+                add(ModuleRecord("Locale", "Loaded translation locale", stringValue(translations, "locale", "en")))
+                add(ModuleRecord("Catalog keys", "Translation keys returned", catalog.size.toString()))
+                add(ModuleRecord("Currencies", "Active supported currencies", currencies.size.toString()))
+                add(ModuleRecord("Countries", "Active supported countries", countries.size.toString()))
+            },
+            actions = listOf(
+                ModuleAction("Review catalog", "Inspect the current translation payload."),
+                ModuleAction("Open locale defaults", "Review currencies and countries."),
+            ),
+            category = ModuleCategory.Platform,
+        )
+    }
+
+    suspend fun marketModule(): ModuleSpec {
+        val summary = loadRemote(remote = { longTailApi?.marketSummary() }, fallback = emptyMap<String, Any?>())
+        val signals = loadRemote(remote = { longTailApi?.marketSignals(limit = 5) }, fallback = emptyList<Map<String, Any?>>())
+        val alerts = loadRemote(remote = { longTailApi?.marketAlerts() }, fallback = emptyList<Map<String, Any?>>())
+        val competitors = loadRemote(remote = { longTailApi?.marketCompetitors() }, fallback = emptyList<Map<String, Any?>>())
+        val recommendations = loadRemote(remote = { longTailApi?.marketRecommendations() }, fallback = emptyList<Map<String, Any?>>())
+
+        return moduleSpec(
+            route = "market",
+            title = "Market Intelligence",
+            subtitle = "Competitors, signals, alerts, and recommendations.",
+            backendPrefix = "/api/v1/market",
+            heroMetric = "${signals.size} recent signals",
+            description = "Track competitor posture and market pressure from the backend market intelligence family.",
+            records = buildList {
+                addAll(recordsFromMap(summary, limit = 3))
+                add(ModuleRecord("Alerts", "Unacknowledged market alerts", alerts.size.toString()))
+                add(ModuleRecord("Competitors", "Competitor rows returned", competitors.size.toString()))
+                add(ModuleRecord("Recommendations", "Market recommendation rows", recommendations.size.toString()))
+            },
+            actions = listOf(
+                ModuleAction("Review competitors", "Compare pricing strategy and market share."),
+                ModuleAction("Open recommendations", "Inspect market-driven actions."),
+            ),
+            category = ModuleCategory.Commerce,
+        )
+    }
+
+    suspend fun taxModule(): ModuleSpec {
+        val config = loadRemote(
+            remote = { longTailApi?.taxConfig() },
+            fallback = mapOf(
+                "tax_id" to null,
+                "registration_type" to "STANDARD",
+                "is_tax_enabled" to false,
+            ),
+        )
+        val summary = loadRemote(
+            remote = { longTailApi?.taxFilingSummary(currentPeriod()) },
+            fallback = mapOf(
+                "period" to currentPeriod(),
+                "country_code" to "IN",
+                "total_taxable" to 0,
+                "total_tax" to 0,
+                "invoice_count" to 0,
+                "status" to "PENDING",
+            ),
+        )
+
+        return moduleSpec(
+            route = "tax",
+            title = "Tax Engine",
+            subtitle = "Tax config and filing summary across countries.",
+            backendPrefix = "/api/v1/tax",
+            heroMetric = "${stringValue(summary, "invoice_count", "0")} invoices",
+            description = "Surface tax registration state and filing summary from the backend tax engine family.",
+            records = buildList {
+                addAll(recordsFromMap(config))
+                addAll(recordsFromMap(summary, excludeKeys = setOf("period", "country_code")))
+            },
+            actions = listOf(
+                ModuleAction("Open config", "Review store tax registration state."),
+                ModuleAction("Inspect filing summary", "Check the current period tax totals."),
+            ),
+            category = ModuleCategory.Compliance,
+        )
+    }
+
+    suspend fun financeModule(): ModuleSpec {
+        val dashboard = loadPlainRemote(
+            remote = { longTailApi?.financeDashboard() },
+            fallback = mapOf(
+                "cash_on_hand" to 0,
+                "treasury_balance" to 0,
+                "total_debt" to 0,
+                "credit_score" to 0,
+            ),
+        )
+        val treasuryBalance = loadPlainRemote(
+            remote = { longTailApi?.treasuryBalance() },
+            fallback = mapOf("available" to 0, "yield_bps" to 0, "currency" to "INR"),
+        )
+        val treasuryConfig = loadPlainRemote(
+            remote = { longTailApi?.treasuryConfig() },
+            fallback = mapOf(
+                "auto_transfer_enabled" to false,
+                "reserve_percentage" to 0,
+                "daily_transfer_limit" to 0,
+                "strategy" to "OFF",
+            ),
+        )
+        val treasuryTransactions = loadPlainRemote(remote = { longTailApi?.treasuryTransactions() }, fallback = emptyList<Map<String, Any?>>())
+        val accounts = loadPlainRemote(remote = { longTailApi?.accounts() }, fallback = emptyList<Map<String, Any?>>())
+        val loans = loadPlainRemote(remote = { longTailApi?.loans() }, fallback = emptyList<Map<String, Any?>>())
+
+        return moduleSpec(
+            route = "finance",
+            title = "Finance",
+            subtitle = "Treasury, balances, accounts, and lending state.",
+            backendPrefix = "/api/v2/finance",
+            heroMetric = "${stringValue(treasuryBalance, "available", "0")} ${stringValue(treasuryBalance, "currency", "INR")}",
+            description = "Expose treasury balance, sweep config, accounts, and loan state from the finance v2 family.",
+            records = buildList {
+                addAll(recordsFromMap(dashboard))
+                addAll(recordsFromMap(treasuryConfig, limit = 3))
+                add(ModuleRecord("Accounts", "Financial account rows", accounts.size.toString()))
+                add(ModuleRecord("Loans", "Loan rows", loans.size.toString()))
+                add(ModuleRecord("Treasury txns", "Recent treasury transactions", treasuryTransactions.size.toString()))
+            },
+            actions = listOf(
+                ModuleAction("Open treasury", "Review reserve balance and sweep configuration."),
+                ModuleAction("Inspect accounts", "Check accounts, ledger, and loans."),
+            ),
+            category = ModuleCategory.Finance,
+        )
+    }
+
+    suspend fun aiModule(): ModuleSpec {
+        val prompts = assistantPrompts()
+        val recommendationMap = loadPlainRemote(
+            remote = { aiV2Api?.recommend(mapOf("user_id" to currentSession()?.userId)) },
+            fallback = mapOf("recommendations" to emptyList<Map<String, Any?>>()),
+        )
+        val recommendations = asStringMapList(recommendationMap["recommendations"])
+
+        return moduleSpec(
+            route = "ai",
+            title = "AI V2",
+            subtitle = "Forecast, recommendations, and optimization entry points.",
+            backendPrefix = "/api/v2/ai",
+            heroMetric = "${recommendations.size} AI recommendations",
+            description = "Represent the AI v2 family used for recommendations, forecast, vision, and pricing optimization flows.",
+            records = buildList {
+                add(ModuleRecord("Prompt presets", "Assistant prompts available", prompts.size.toString()))
+                recommendations.take(3).forEach { row ->
+                    add(
+                        ModuleRecord(
+                            title = stringValue(row, "title", "Recommendation"),
+                            supportingText = stringValue(row, "priority", "AI"),
+                            value = stringValue(row, "description", "Recommendation available"),
+                        ),
+                    )
+                }
+                add(ModuleRecord("Forecast route", "AI forecast endpoint", "Available"))
+                add(ModuleRecord("Pricing optimize", "AI pricing optimization endpoint", "Available"))
+            },
+            actions = listOf(
+                ModuleAction("Run recommendation", "Request AI recommendations for the current store."),
+                ModuleAction("Open AI vision", "Use AI vision and pricing endpoints."),
+            ),
+            category = ModuleCategory.Platform,
         )
     }
 
@@ -1676,10 +2056,21 @@ class RetailIqRepository private constructor(
 
     suspend fun module(route: String): ModuleSpec {
         return when (route) {
+            "dashboard" -> dashboardModule()
+            "inventory" -> inventoryModule()
+            "transactions" -> transactionsModule()
+            "analytics" -> analyticsModule()
+            "barcodes" -> barcodesModule()
+            "i18n" -> i18nModule()
+            "market" -> marketModule()
             "gst" -> gstModule()
             "loyalty" -> loyaltyModule()
             "credit" -> creditModule()
             "kyc" -> kycModule()
+            "ops" -> opsModule()
+            "tax" -> taxModule()
+            "finance" -> financeModule()
+            "ai" -> aiModule()
             "marketplace" -> marketplaceModule()
             "chain" -> chainModule()
             "pricing" -> pricingModule()
@@ -1699,15 +2090,21 @@ class RetailIqRepository private constructor(
         allowRefresh: Boolean = true,
     ): T {
         return try {
-            remote() ?: fallback
+            remote() ?: if (shouldUseFallbackData()) fallback else error("Backend response was empty.")
         } catch (error: HttpException) {
             if (allowRefresh && error.code() == 401 && refreshSession() != null) {
                 loadPlainRemote(remote = remote, fallback = fallback, allowRefresh = false)
-            } else {
+            } else if (shouldUseFallbackData()) {
                 fallback
+            } else {
+                throw error
             }
-        } catch (_: Exception) {
-            fallback
+        } catch (error: Exception) {
+            if (shouldUseFallbackData()) {
+                fallback
+            } else {
+                throw error
+            }
         }
     }
 
@@ -1717,15 +2114,21 @@ class RetailIqRepository private constructor(
         allowRefresh: Boolean = true,
     ): T {
         return try {
-            remote()?.unwrapOrThrow() ?: fallback
+            remote()?.unwrapOrThrow() ?: if (shouldUseFallbackData()) fallback else error("Backend response was empty.")
         } catch (error: HttpException) {
             if (allowRefresh && error.code() == 401 && refreshSession() != null) {
                 loadRemote(remote = remote, fallback = fallback, allowRefresh = false)
-            } else {
+            } else if (shouldUseFallbackData()) {
                 fallback
+            } else {
+                throw error
             }
-        } catch (_: Exception) {
-            fallback
+        } catch (error: Exception) {
+            if (shouldUseFallbackData()) {
+                fallback
+            } else {
+                throw error
+            }
         }
     }
 
@@ -1763,19 +2166,79 @@ class RetailIqRepository private constructor(
     }
 
     companion object {
+        private const val EMULATOR_BASE_URL = "http://10.0.2.2:5000"
+        private const val DEVICE_DEBUG_BASE_URL = "http://127.0.0.1:5000"
+
         fun create(): RetailIqRepository {
-            return buildRepository(InMemorySessionStore())
+            return buildRepository(
+                sessionStore = InMemorySessionStore(),
+                baseUrl = "",
+                allowFallbackData = true,
+            )
         }
 
         fun create(context: Context): RetailIqRepository {
-            return buildRepository(EncryptedPreferencesSessionStore(context.applicationContext))
+            return buildRepository(
+                sessionStore = EncryptedPreferencesSessionStore(context.applicationContext),
+                baseUrl = resolveBackendBaseUrl(
+                    BuildConfig.RETAILIQ_BASE_URL,
+                    useEmulatorHost = isProbablyEmulator(),
+                ),
+                allowFallbackData = true,
+            )
         }
 
-        private fun buildRepository(sessionStore: SessionStore): RetailIqRepository {
-            val baseUrl = BuildConfig.RETAILIQ_BASE_URL.trim().removeSuffix("/")
+        internal fun resolveBackendBaseUrl(
+            configuredBaseUrl: String,
+            isDebug: Boolean = BuildConfig.DEBUG,
+            useEmulatorHost: Boolean = isProbablyEmulator(),
+        ): String {
+            val normalizedBaseUrl = configuredBaseUrl.trim().removeSuffix("/")
+            return when {
+                normalizedBaseUrl.isNotBlank() -> normalizedBaseUrl
+                isDebug && useEmulatorHost -> EMULATOR_BASE_URL
+                isDebug -> DEVICE_DEBUG_BASE_URL
+                else -> error("RETAILIQ_BASE_URL must be set in release builds.")
+            }
+        }
+
+        internal fun isProbablyEmulator(
+            fingerprint: String? = AndroidBuild.FINGERPRINT,
+            model: String? = AndroidBuild.MODEL,
+            manufacturer: String? = AndroidBuild.MANUFACTURER,
+            brand: String? = AndroidBuild.BRAND,
+            device: String? = AndroidBuild.DEVICE,
+            product: String? = AndroidBuild.PRODUCT,
+        ): Boolean {
+            val normalizedFingerprint = fingerprint.orEmpty().lowercase()
+            val normalizedModel = model.orEmpty().lowercase()
+            val normalizedManufacturer = manufacturer.orEmpty().lowercase()
+            val normalizedBrand = brand.orEmpty().lowercase()
+            val normalizedDevice = device.orEmpty().lowercase()
+            val normalizedProduct = product.orEmpty().lowercase()
+
+            return normalizedFingerprint.startsWith("generic") ||
+                normalizedFingerprint.contains("emulator") ||
+                normalizedFingerprint.contains("virtual") ||
+                normalizedModel.contains("sdk_gphone") ||
+                normalizedModel.contains("emulator") ||
+                normalizedModel.contains("android sdk built for") ||
+                normalizedManufacturer.contains("genymotion") ||
+                (normalizedBrand.startsWith("generic") && normalizedDevice.startsWith("generic")) ||
+                normalizedProduct.contains("sdk_gphone") ||
+                normalizedProduct.contains("emulator") ||
+                normalizedProduct.contains("simulator")
+        }
+
+        private fun buildRepository(
+            sessionStore: SessionStore,
+            baseUrl: String,
+            allowFallbackData: Boolean,
+        ): RetailIqRepository {
             if (baseUrl.isBlank()) {
                 return RetailIqRepository(
                     sessionStore = sessionStore,
+                    allowFallbackData = allowFallbackData,
                     authApi = null,
                     dashboardApi = null,
                 storeApi = null,
@@ -1817,6 +2280,7 @@ class RetailIqRepository private constructor(
 
             return RetailIqRepository(
                 sessionStore = sessionStore,
+                allowFallbackData = allowFallbackData,
                 authApi = retrofit.create(AuthApi::class.java),
                 dashboardApi = retrofit.create(DashboardApi::class.java),
                 storeApi = retrofit.create(StoreApi::class.java),

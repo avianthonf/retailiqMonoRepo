@@ -19,6 +19,7 @@ class RetailIqRepositoryTest {
         val receipts = repository.receiptsSnapshot()
         val printJob = repository.createReceiptPrintJob()
         val developer = repository.developerSnapshot()
+        val ops = repository.module("ops")
         val system = repository.systemStatus()
 
         assertEquals("RetailIQ Flagship", store.profile.storeName)
@@ -30,8 +31,13 @@ class RetailIqRepositoryTest {
         assertTrue(receipts.template.templateName.isNotBlank())
         assertTrue(printJob.jobId.isNotBlank())
         assertEquals(2, developer.apps.size)
+        assertEquals("Operations", ops.title)
+        assertEquals("/api/v1/ops", ops.backendPrefix)
         assertEquals("success", system.teamPing)
+        assertEquals(2, system.health.size)
         assertTrue(system.health.any { it.service == "API" })
+        assertTrue(system.health.any { it.service == "Team Ping" })
+        assertTrue(system.health.none { it.service == "Database" || it.service == "Redis" })
     }
 
     @Test

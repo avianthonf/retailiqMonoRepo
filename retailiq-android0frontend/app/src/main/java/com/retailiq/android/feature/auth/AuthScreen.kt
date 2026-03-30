@@ -29,6 +29,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.retailiq.android.core.data.RetailIqRepository
 import com.retailiq.android.core.model.AuthPanel
@@ -104,6 +107,7 @@ fun AuthScreen(
                         label = { Text("Mobile Number") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     )
 
                     OutlinedTextField(
@@ -112,6 +116,8 @@ fun AuthScreen(
                         label = { Text("Password / OTP") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     )
 
                     Button(

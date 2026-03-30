@@ -4,6 +4,12 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val retailIqBaseUrl = providers.gradleProperty("retailiq.baseUrl").orNull?.trim().orEmpty()
+
+fun String.asBuildConfigValue(): String {
+    return "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+}
+
 android {
     namespace = "com.retailiq.android"
     compileSdk = 35
@@ -19,14 +25,23 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-        val baseUrl = project.findProperty("retailiq.baseUrl") as String? ?: ""
-        buildConfigField("String", "RETAILIQ_BASE_URL", "\"$baseUrl\"")
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "RETAILIQ_BASE_URL",
+                retailIqBaseUrl.asBuildConfigValue(),
+            )
+        }
         release {
             isMinifyEnabled = false
+            buildConfigField(
+                "String",
+                "RETAILIQ_BASE_URL",
+                retailIqBaseUrl.asBuildConfigValue(),
+            )
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",

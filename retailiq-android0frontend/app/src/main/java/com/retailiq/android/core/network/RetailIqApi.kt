@@ -40,7 +40,6 @@ import com.retailiq.android.core.model.StoreProfileDto
 import com.retailiq.android.core.model.StoreTaxConfigDto
 import com.retailiq.android.core.model.SupplierDetailDto
 import com.retailiq.android.core.model.SupplierListItemDto
-import com.retailiq.android.core.model.SystemHealthDto
 import com.retailiq.android.core.model.TeamPingDto
 import com.retailiq.android.core.model.VisionActionResponseDto
 import com.retailiq.android.core.model.VisionOcrJobDto
@@ -234,11 +233,17 @@ interface StoreApi {
 }
 
 interface OperationsApi {
-    @GET("/api/v1/developer")
-    suspend fun modules(): ApiEnvelope<List<ModuleSpec>>
+    @GET(OPS_MAINTENANCE_PATH)
+    suspend fun maintenance(): Map<String, Any?>
 }
 
 interface LongTailApi {
+    @GET("/api/v1/barcodes/lookup")
+    suspend fun barcodeLookup(@Query("value") value: String): ApiEnvelope<Map<String, Any?>>
+
+    @GET("/api/v1/barcodes/list")
+    suspend fun barcodeList(@Query("product_id") productId: Long): ApiEnvelope<List<Map<String, Any?>>>
+
     @GET("/api/v1/gst/config")
     suspend fun gstConfig(): ApiEnvelope<Map<String, Any?>>
 
@@ -256,6 +261,15 @@ interface LongTailApi {
 
     @GET("/api/v1/loyalty/expiring-points")
     suspend fun loyaltyExpiringPoints(@Query("days") days: Int = 30): ApiEnvelope<List<Map<String, Any?>>>
+
+    @GET("/api/v2/finance/treasury/balance")
+    suspend fun treasuryBalance(): Map<String, Any?>
+
+    @GET("/api/v2/finance/treasury/config")
+    suspend fun treasuryConfig(): Map<String, Any?>
+
+    @GET("/api/v2/finance/treasury/transactions")
+    suspend fun treasuryTransactions(): List<Map<String, Any?>>
 
     @GET("/api/v2/finance/dashboard")
     suspend fun financeDashboard(): Map<String, Any?>
@@ -277,6 +291,45 @@ interface LongTailApi {
 
     @GET("/api/v1/kyc/kyc/status")
     suspend fun kycStatus(): ApiEnvelope<List<Map<String, Any?>>>
+
+    @GET("/api/v1/i18n/i18n/translations")
+    suspend fun translations(
+        @Query("locale") locale: String = "en",
+        @Query("module") module: String? = null,
+    ): ApiEnvelope<Map<String, Any?>>
+
+    @GET("/api/v1/i18n/i18n/currencies")
+    suspend fun currencies(): ApiEnvelope<List<Map<String, Any?>>>
+
+    @GET("/api/v1/i18n/i18n/countries")
+    suspend fun countries(): ApiEnvelope<List<Map<String, Any?>>>
+
+    @GET("/api/v1/market/summary")
+    suspend fun marketSummary(): ApiEnvelope<Map<String, Any?>>
+
+    @GET("/api/v1/market/signals")
+    suspend fun marketSignals(
+        @Query("category_id") categoryId: Int? = null,
+        @Query("signal_type") signalType: String? = null,
+        @Query("limit") limit: Int = 20,
+    ): ApiEnvelope<List<Map<String, Any?>>>
+
+    @GET("/api/v1/market/indices")
+    suspend fun marketIndices(
+        @Query("category_id") categoryId: Int? = null,
+        @Query("days") days: Int = 30,
+    ): ApiEnvelope<List<Map<String, Any?>>>
+
+    @GET("/api/v1/market/alerts")
+    suspend fun marketAlerts(
+        @Query("unacknowledged_only") unacknowledgedOnly: Boolean = true,
+    ): ApiEnvelope<List<Map<String, Any?>>>
+
+    @GET("/api/v1/market/competitors")
+    suspend fun marketCompetitors(@Query("region") region: String? = null): ApiEnvelope<List<Map<String, Any?>>>
+
+    @GET("/api/v1/market/recommendations")
+    suspend fun marketRecommendations(): ApiEnvelope<List<Map<String, Any?>>>
 
     @GET("/api/v1/marketplace/recommendations")
     suspend fun marketplaceRecommendations(): ApiEnvelope<List<Map<String, Any?>>>
@@ -304,6 +357,15 @@ interface LongTailApi {
 
     @GET("/api/v1/pricing/history")
     suspend fun pricingHistory(@Query("product_id") productId: Int): ApiEnvelope<List<Map<String, Any?>>>
+
+    @GET("/api/v1/tax/config")
+    suspend fun taxConfig(@Query("country_code") countryCode: String = "IN"): ApiEnvelope<Map<String, Any?>>
+
+    @GET("/api/v1/tax/filing-summary")
+    suspend fun taxFilingSummary(
+        @Query("period") period: String,
+        @Query("country_code") countryCode: String = "IN",
+    ): ApiEnvelope<Map<String, Any?>>
 
     @GET("/api/v1/decisions")
     suspend fun decisions(): Map<String, Any?>
@@ -387,6 +449,9 @@ interface VisionApi {
 }
 
 interface AiV2Api {
+    @POST("/api/v2/ai/forecast")
+    suspend fun forecast(@Body body: Map<String, Any?>): ApiEnvelope<Map<String, Any?>>
+
     @POST("/api/v2/ai/vision/shelf-scan")
     suspend fun shelfScan(@Body body: Map<String, Any?>): ApiEnvelope<Map<String, Any?>>
 
@@ -394,10 +459,13 @@ interface AiV2Api {
     suspend fun receipt(@Body body: Map<String, Any?>): ApiEnvelope<Map<String, Any?>>
 
     @POST("/api/v2/ai/nlp/query")
-    suspend fun query(@Body body: Map<String, Any?>): ApiEnvelope<NlpResponseDto>
+    suspend fun query(@Body body: Map<String, Any?>): Map<String, Any?>
 
     @POST("/api/v2/ai/recommend")
-    suspend fun recommend(@Body body: Map<String, Any?>): ApiEnvelope<NlpRecommendationsDto>
+    suspend fun recommend(@Body body: Map<String, Any?>): Map<String, Any?>
+
+    @POST("/api/v2/ai/pricing/optimize")
+    suspend fun pricingOptimize(@Body body: Map<String, Any?>): ApiEnvelope<List<Map<String, Any?>>>
 }
 
 interface DeveloperApi {
@@ -456,9 +524,9 @@ interface DeveloperApi {
 }
 
 interface SystemApi {
-    @GET("/api/v1/health")
-    suspend fun health(): SystemHealthDto
+    @GET(HEALTH_PATH)
+    suspend fun health(): Map<String, Any?>
 
-    @GET("/api/v1/team/ping")
+    @GET(TEAM_PING_PATH)
     suspend fun teamPing(): TeamPingDto
 }
